@@ -373,3 +373,53 @@ FROM EMPLOYEE
 WHERE BONUS IS NOT NULL; -- 방법1
 -- WHERE NOT BONUS IS NULL; -- 방법2
 -- NOT은 컬럼명앞 또는 IS 뒤에서 사용가능
+
+-- 부서배치를 아직 받지 않았지만 보너스는 받는 사원들의 이름, 보너스, 부서코드 조회
+SELECT EMP_NAME, BONUS, DEPT_CODE
+FROM EMPLOYEE
+WHERE DEPT_CODE IS NULL AND BONUS IS NOT NULL;
+
+--------------------------------------------------------------------------------
+/*
+    < IN >
+    비교대상 컬럼 값이 내가 제시한 목록중에 일치하는 값이 있는 지 
+    
+    [표현법]
+    비교대상컬럼 IN ('값1', '값2', '값3',.....)
+*/
+
+-- 부서코드가 'D6'이거나 'D8'이거나 'D5'인 부서원들의 이름, 부서코드, 급여조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+-- WHERE DEPT_CODE = 'D6' OR DEPT_CODE = 'D8' OR DEPT_CODE = 'D5';
+WHERE DEPT_CODE IN ('D6', 'D8', 'D5');
+
+-- 그 외의 사원들
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE NOT DEPT_CODE IN ('D6', 'D8', 'D5'); -- 방법1 
+-- WHERE DEPT_CODE NOT IN ('D6', 'D8', 'D5'); 방법2
+
+--------------------------------------------------------------------------------
+/*
+    <연산자 우선순위>
+    0. ()
+    1. 산술연산자
+    2. 연결연산자 ||
+    3. 비교연산자
+    4. IS NULL / LIKE / IN
+    5. BETWEEN A AND B
+    6. NOT(논리연산자)
+    7. AND(논리연산자)
+    8. OR(논리연산자)
+*/
+
+-- ** OR보다 AND가 먼저 연산이 됨 **
+-- 직급코드가 'J7'이거나 'J2'인 사람들 중 급여가 200만원 이상인 사원들의 모든 컬럼 조회
+SELECT *
+FROM EMPLOYEE
+-- WHERE JOB_CODE = 'J7' OR JOB_CODE = 'J2' AND SALARY >= 2000000;
+-- AND가 먼저 실행돼서 J2이면서 2000000원이 넘는 사원이 먼저 출력되고 그 외에 급여 상관없이 J7인 사원들도 출력됨
+WHERE (JOB_CODE = 'J7' OR JOB_CODE = 'J2') AND SALARY >= 2000000;
+
+------------------------------- 실습 문제 ----------------------------------------
