@@ -313,3 +313,63 @@ WHERE EMP_NAME LIKE '_하_';
 SELECT EMP_ID, EMP_NAME, PHONE, EMAIL
 FROM EMPLOYEE
 WHERE PHONE LIKE '__1%';
+
+-- ** 특이케이스
+-- 이메일 중 _기준으로 앞글자가 3글자인 사원들의 사번, 이름, 이메일 조회
+SELECT EMP_ID, EMP_NAME, EMAIL
+FROM EMPLOYEE
+WHERE EMAIL LIKE '____%'; -- 원하는 결과 도출 X
+-- 와일드카드로 사용되고 있는 문자와 컬럼값에 담긴 문자가 동일하기 때문에 제대로 조회X
+--> 어떤 게 와일드카드이고 어떤 게 데이터 값인지 구분지어야됨
+--> 데이터 값으로 취급하고자 하는 값 앞에 나만의 와일드카드를 제시하고 나만의 와일드카드를 ESCAPE OPTION으로 등록해야됨
+
+SELECT EMP_ID, EMP_NAME, EMAIL
+FROM EMPLOYEE
+WHERE EMAIL LIKE '___$_%' ESCAPE '$'; -- $말고 다른 문자 사용 해도 됨
+
+-- 위의 사원들이 아닌 그 외의 사원들 조회
+SELECT EMP_ID, EMP_NAME, EMAIL
+FROM EMPLOYEE
+-- WHERE NOT EMAIL LIKE '___$_%' ESCAPE '$'; -- 방법 1 
+WHERE EMAIL NOT LIKE '___$_%' ESCAPE '$'; -- 방법 2
+-- NOT은 컬럼명 앞 또는 LIKE 앞에 기입 가능
+
+----------------------------- 실습문제 ------------------------------------------
+-- 1. EMPLOYEE 테이블에서 이름이 '연'으로 끝나는 사원들의 사원명, 입사일 조회
+SELECT EMP_NAME, HIRE_DATE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '%연';
+
+-- 2. 이름에 '하'가 포함되어있고, 급여가 240만원 이상인 사원들의 사원명, 급여 조회 
+SELECT EMP_NAME, SALARY || '원' AS "SALARY"
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '%하%' AND SALARY >= 2400000;
+
+-- 3. 전화번호 처음 3자리가 010이 아닌 사원들의 사원명, 전화번호 조회
+SELECT EMP_NAME, PHONE
+FROM EMPLOYEE
+WHERE NOT PHONE LIKE '010%';
+
+-- 4. DEPARTMENT 테이블에서 해외영업부인 부서들의 부서코드, 부서명
+SELECT DEPT_ID, DEPT_TITLE
+FROM DEPARTMENT
+WHERE DEPT_TITLE LIKE '해외영업%';
+
+--------------------------------------------------------------------------------
+/*
+    <IS NULL / IS NOT NULL>
+    컬럼값에 NULL이 있을 경우 NULL값 비교에 사용되는 연산자
+*/
+
+-- 보너스를 받지 않는 사원(보너스의 값이 NULL)들의 사번, 이름, 급여, 보너스 조회
+SELECT EMP_ID, EMP_NAME, SALARY, BONUS
+FROM EMPLOYEE
+WHERE BONUS IS NULL;
+-- WHERE BONUS = NULL; X 아무것도 출력안됨
+
+-- 보너스를 받는 사원(BONUS의 값이 NULL이 아님)들의 사번, 이름, 급여, 보너스 조회
+SELECT EMP_ID, EMP_NAME, SALARY, BONUS
+FROM EMPLOYEE
+WHERE BONUS IS NOT NULL; -- 방법1
+-- WHERE NOT BONUS IS NULL; -- 방법2
+-- NOT은 컬럼명앞 또는 IS 뒤에서 사용가능
