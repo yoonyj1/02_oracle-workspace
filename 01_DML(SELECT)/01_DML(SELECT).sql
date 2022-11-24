@@ -216,3 +216,100 @@ WHERE (SALARY * 12) >= 50000000;
 SELECT EMP_ID, EMP_NAME, JOB_CODE, ENT_YN
 FROM EMPLOYEE
 WHERE JOB_CODE != 'J3';
+
+-- 부서코드 'D9'이면서 급여가 500만원 이상인 사원들의 사번, 사원명, 급여, 부서코드 조회
+SELECT EMP_ID, EMP_NAME, SALARY || '원' AS "SALARY", DEPT_CODE
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D9' AND SALARY >= 5000000;
+
+-- 부서코드가 'D6'이거나 급여가 300만원 이상인 사원들의 사원명, 부서코드, 급여 조회
+SELECT EMP_NAME, DEPT_CODE, SALARY || '원' AS "SALARY"
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D6' OR SALARY >= 3000000;
+
+-- 급여가 350만원 이상 600만원 이하를 받는 사원들의 사원명, 사번, 급여 조회
+SELECT EMP_NAME, EMP_ID, SALARY
+FROM EMPLOYEE
+WHERE SALARY >= 3500000 AND SALARY <= 6000000;
+-- WHERE 3500000 <= SALARY <= 6000000 (X) 오류 발생
+
+--------------------------------------------------------------------------------
+
+/*
+    <BETWEEN A AND B>
+    조건식에서 사용되는 구문
+    몇 이상 몇 이하인 범위에 대한 조건을 제시할 때 사용되는 연산자
+    
+    [표현법]
+    비교대상컬럼 BETWEEN A(값1) AND B(값2)
+    -> 해당 컬럼 값이 A 이상이고 B 이하인 경우
+*/
+
+-- 급여가 350만원 이상 600만원 이하를 받는 사원들의 사원명, 사번, 급여 조회
+SELECT EMP_NAME, EMP_ID, SALARY
+FROM EMPLOYEE
+WHERE SALARY BETWEEN 3500000 AND 6000000;
+
+-- 위의 쿼리범위 밖의 사람들 조회 (350만원 미만, 600만원 초과)
+SELECT EMP_NAME, EMP_ID, SALARY
+FROM EMPLOYEE
+-- WHERE SALARY < 3500000 OR SALARY > 6000000; 방법1 
+-- WHERE NOT SALARY BETWEEN 3500000 AND 6000000; 방법2
+WHERE SALARY NOT BETWEEN 3500000 AND 6000000; -- 방법3
+
+-- NOT: 논리부정 연산자
+-- 컬럼명 앞 또는 BETWEEN 앞에 기입 가능
+
+-- 입사일이 '90/01/01' ~ '01/01/01' 모든 컬럼 조회(BETWEEN)
+SELECT *
+FROM EMPLOYEE
+-- WHERE HIRE_DATE BETWEEN '90/01/01' AND '01/01/01';
+WHERE HIRE_DATE >= '90/01/01' AND HIRE_DATE <= '01/01/01';
+-- DATE 형식은 대소 비교 가능
+
+--------------------------------------------------------------------------------
+
+/*
+    <LIKE>
+    비교하고자 하는 컬럼값이 내가 제시한 특정 패턴에 만족될 경우 조회
+    
+    [표현법]
+    비교대상 컬럼 LIKE '특정패턴'
+    
+    - 특정 패턴 제시 시 '%', '_'를 와일드카드로 사용할 수 있음
+    >> '%': 0글자 이상
+     EX) 비교대상컬럼 LIKE '문자%'      => 비교대상의 컬럼값이 문자로 "시작" 되는 것 조회
+         비교대상컬럼 LIKE '%문자'      => 비교대상의 컬럼값이 문자로 "끝"나는 것 조회
+         비교대상컬럼 LIKE '%문자%'     => 비교대상의 컬럼값이 문자가 "포함"되는 것 조회(키워드 검색에 사용)
+         
+    >> '_': 1글자    
+     EX) 비교대상컬럼 LIKE '_문자'      => 비교대상의 컬럼값이 문자 앞에 무조건 한글자가 올 경우 조회
+         비교대상컬럼 LIKE '문자_'      => 비교대상의 컬럼값이 문자 뒤에 무조건 한글자가 올 경우 조회
+         비교대상컬럼 LIKE '_문자_'     => 비교대상의 컬럼값이 문자 앞뒤로 무조건 한글자가 올 경우 조회
+*/
+
+-- 사원들 중 성이 전씨인 사원들의 사원명, 급여, 입사일 조회
+SELECT EMP_NAME, SALARY, HIRE_DATE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '전%';
+
+-- 이름중에 하가 포함된 사원들의 사원명, 주민번호, 전화번호 조회
+SELECT EMP_NAME, EMP_NO, PHONE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '%하%';
+-- 하%: '하'로 시작하는 것 찾음
+-- %하: '하'로 끝나는 것 찾음
+-- %하%: 하% + %하 + %하%
+-- %: 글자 수 상관없음
+
+-- 이름의 가운데 글자가 하 인 사원들의 사원명, 전화번호 조회
+SELECT EMP_NAME, PHONE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '_하_';
+-- _하_ : 가운데에 '하'가 들어가는 것 찾기
+-- _: 한글자를 나타냄 (_하_: 가운데에 '하'가 들어가는 3글자 이름)
+
+-- 전화번호의 3번째 자리가 1인 사원들의 사번, 사원명, 전화번호, 이메일 조회
+SELECT EMP_ID, EMP_NAME, PHONE, EMAIL
+FROM EMPLOYEE
+WHERE PHONE LIKE '__1%';
