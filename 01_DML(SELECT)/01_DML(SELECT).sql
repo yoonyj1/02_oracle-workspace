@@ -105,3 +105,110 @@ FROM EMPLOYEE;
 -- EMPLOYEE 테이블의 사번, 사원명, 급여 조회
 SELECT EMP_ID, EMP_NAME, SALARY, '원' AS "단위"
 FROM EMPLOYEE;
+
+/*
+    <연결 연산자: ||>
+    여러 컬럼값들을 마치 하나의 컬럼인것처럼 연결하거나 컬럼값과 리터럴을 연결할 수 있음
+    System.out.println("num의 값" + num);
+*/
+
+-- 사번과 이름, 급여를 하나의 컬럼으로 조회
+SELECT EMP_ID || EMP_NAME || SALARY
+FROM EMPLOYEE;
+
+-- 컬럼값과 리터럴 연결
+-- XXX의 월급은 XXX원입니다 => 별칭: 급여정보
+SELECT EMP_NAME || '의 월급은 ' || SALARY || '원 입니다' AS "급여정보"
+FROM EMPLOYEE;
+
+/*
+    <DISTINCT>
+    컬럼의 중복된 값들을 한 번씩만 표시하고자 할 때 사용
+
+*/
+-- 현재 우리회사에 어떤 직급의 사람들이 존재하는 지 궁금할 때
+-- EMPLOYEE 테이블의 직급 코드 조회
+SELECT JOB_CODE
+FROM EMPLOYEE;
+
+-- EMPLOYEE 테이블의 직급 코드 조회(중복 제거)
+SELECT DISTINCT JOB_CODE
+FROM EMPLOYEE; -- 중복제거되어 7행만 조회됨
+
+-- 사원들이 어떤 부서에 속해있는 지 궁금할 때
+SELECT DISTINCT DEPT_CODE
+FROM EMPLOYEE; -- NULL: 아직 부서배치가 안된 사람
+
+/* DISTINCT 유의사항
+  - SELECT절에 단 한번만 기술 가능
+    SELECT DISTINCT JOB_CODE, DISTINCT DEPT_CODE
+    FROM EMPLOYEE;
+    구문 오류
+    
+    SELECT DISTINCT JOB_CODE, DEPT_CODE
+    FROM EMPLOYEE;
+    중복 제거되서 출력
+    -- JOB_CODE, DEPT_CODE를 한 쌍으로 묶어서 중복 판별
+*/
+
+--------------------------------------------------------------------------------
+
+/*
+    <WHERE 절>
+    조회하고자 하는 테이블로부터 특정 조건을 만족하는 데이터만을 조회하고자 할 때 사용
+    이 때 WHERE절에는 조건식을 제시함.
+    조건식에서는 다양한 연산자 사용가능
+    
+    [표현법]
+    SELECT 컬럼1, 컬럼2,...
+    FROM 테이블명
+    WHERE 조건식;
+    
+    [비교연산자]
+    >, <, >=, <=  --> 대소비교
+    =             --> 동등비교
+    !=, ^=, <>    --> 동등하지 않은지 비교
+*/
+
+-- EMPLOYEE 테이블에서 부서코드가 'D9'인 사원들만 조회(모든 컬럼 조회)
+SELECT *
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D9';
+
+-- EMPLOYEE 테이블에서 부서코드가 'D1'인 사원들의 사원명, 급여, 부서코드만 조회
+SELECT EMP_NAME, SALARY, DEPT_CODE
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D1';
+
+-- EMPLOYEE 테이블에서 부서코드가 'D1'이 아닌 사원들의 사번, 사원명, 부서코드만 조회
+SELECT EMP_ID, EMP_NAME, DEPT_CODE
+FROM EMPLOYEE
+-- WHERE DEPT_CODE != 'D1';
+-- WHERE DEPT_CODE ^= 'D1';
+WHERE DEPT_CODE <> 'D1';
+
+-- 급여가 400만원 이상인 사원들의 사원명, 부서코드, 급여조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY >= 4000000;
+
+-- EMPLOYEE 테이블에서 재직 중(ENT-YN컬럼값이 'N')인 사원들의 사번, 이름, 입사일 조회
+SELECT EMP_ID, EMP_NAME, HIRE_DATE
+FROM EMPLOYEE
+WHERE ENT_YN = 'N';
+
+---------------------------- 실습 문제 ------------------------------------------
+-- 1. 급여 300만원 이상인 사원들의 사원명, 급여, 입사일, 연봉(보너스 미포함) 조회
+SELECT EMP_NAME, HIRE_DATE, SALARY * 12 AS "연봉(보너스 미포함)"
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+-- 2. 연봉이 5000만원 이상 사원들의 사원명, 급여, 연봉, 부서코드 조회
+SELECT EMP_NAME, SALARY, SALARY * 12 AS "연봉(보너스 미포함)", DEPT_CODE
+FROM EMPLOYEE
+WHERE (SALARY * 12) > 50000000;
+
+-- 3. 직급코드가 'J3'이 아닌 사원들의 사번, 사원명, 직급코드, 퇴사여부 조회
+SELECT EMP_ID, EMP_NAME, JOB_CODE, ENT_YN
+FROM EMPLOYEE
+WHERE JOB_CODE != 'J3';
