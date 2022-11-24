@@ -199,14 +199,18 @@ WHERE ENT_YN = 'N';
 
 ---------------------------- 실습 문제 ------------------------------------------
 -- 1. 급여 300만원 이상인 사원들의 사원명, 급여, 입사일, 연봉(보너스 미포함) 조회
-SELECT EMP_NAME, HIRE_DATE, SALARY * 12 AS "연봉(보너스 미포함)"
+SELECT EMP_NAME, SALARY || '원' AS "급여", HIRE_DATE, SALARY * 12 || '원' AS "연봉(보너스 미포함)"
 FROM EMPLOYEE
-WHERE SALARY > 3000000;
+WHERE SALARY >= 3000000;
 
 -- 2. 연봉이 5000만원 이상 사원들의 사원명, 급여, 연봉, 부서코드 조회
-SELECT EMP_NAME, SALARY, SALARY * 12 AS "연봉(보너스 미포함)", DEPT_CODE
+SELECT EMP_NAME, SALARY || '원' AS "급여", SALARY * 12 || '원' AS "연봉(보너스 미포함)", DEPT_CODE
 FROM EMPLOYEE
-WHERE (SALARY * 12) > 50000000;
+WHERE (SALARY * 12) >= 50000000;
+-- WHERE 연봉 >= 50000000; 오류 > SELECT절에서 작성된 별칭 사용불가 => 쿼리 실행순서 때문에
+
+-- 쿼리 실행 순서
+-- FROM절 -> WHERE절 -> SELECT절
 
 -- 3. 직급코드가 'J3'이 아닌 사원들의 사번, 사원명, 직급코드, 퇴사여부 조회
 SELECT EMP_ID, EMP_NAME, JOB_CODE, ENT_YN
