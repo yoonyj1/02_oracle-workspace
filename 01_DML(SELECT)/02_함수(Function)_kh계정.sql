@@ -91,3 +91,26 @@ ORDER BY EMP_NAME;
 -- 함수 중첩 사용
 SELECT EMP_NAME, EMAIL, SUBSTR(EMAIL, 1, INSTR(EMAIL, '@')-1) AS "아이디"
 FROM EMPLOYEE;
+
+--------------------------------------------------------------------------------
+/*
+    * LPAD / RPAD
+    문자열을 조회할 때 통일감 있게 조회하고자 할 때 사용
+    
+    LPAD/RPAD(STRING, 최종적으로 반환할 문자의 길이, [덧붙이고자 하는 문자]) => 생략시 공백으로 채움
+    문자열에 덧붙이고자 하는 문자를 왼쪽/오른쪽에 덧붙여서 최종 N길이만큼의 문자열 반환
+*/
+
+-- 20만큼의 길이 중 EMAIL 컬럼값은 오른쪽으로 정렬하고 나머지 부분은 공백으로 채워짐
+SELECT EMP_NAME, LPAD(EMAIL, 20)
+FROM EMPLOYEE;
+
+SELECT EMP_NAME, LPAD(EMAIL, 20, '#')
+FROM EMPLOYEE;
+
+SELECT EMP_NAME, RPAD(EMAIL, 20, '#')
+FROM EMPLOYEE;
+
+-- 850101-2****** 나오게 조회 -> 총 글자수: 14
+SELECT RPAD('850101-2', 14, '*')
+FROM DUAL;
