@@ -459,3 +459,34 @@ SELECT EMP_ID, EMP_NAME, SALARY -- 3
 FROM EMPLOYEE -- 1 
 WHERE DEPT_CODE IS NULL; -- 2
 --------------------------------------------------------------------------------
+
+/*
+    <ORDER BY절>
+    가장 마지막 줄에 작성뿐만 아니라 실행순서도 가장 마지막에 실행
+    
+    [표현법]
+    SELECT 조회할 컬럼1, 컬럼2,... 산술연산식 AS "별칭"
+    FROM 테이블명
+    WHERE 조건식
+    ORDER BY 정렬하고싶은 컬럼|별칭| 컬럼순번 [ASC(오름차순) | DESC(내림차순)] -> 생략 시 오름차순 [NULLS FIRST|NULLS LAST]
+    
+    - ASC: 오름차순 정렬(생략 시 기본값)
+    - DESC: 내림차순 정렬
+    - NULLS FIRST: 정렬하고자 하는 컬럼값에 NULL이 있을 경우 해당 데이터를 맨 앞에 배치(생략 시 DESC일 때의 기본값) => 맨 앞에 배치
+    - NULLS LAST: 정렬하고자 하는 컬럼값에 NULL이 있을 경우 해당 데이터를 맨 뒤에 배치(생략 시 ASC일 때의 기본값) => 맨 뒤에 배치
+*/
+
+SELECT *
+FROM EMPLOYEE
+-- ORDER BY BONUS;
+-- ORDER BY BONUS ASC; -- 오름차순 정렬일 때 기본적으로 NULLS LAST 
+-- ORDER BY BONUS ASC NULLS FIRST;
+-- ORDER BY BONUS DESC; -- 내림차순 정렬일 때 기본적으로 NULLS FIRST
+ORDER BY BONUS DESC, SALARY ASC; -- 여러가지 조건 제시 가능(첫번째 기준의 컬럼값이 동일할 경우 두번째 기준 컬럼가지고 정렬)
+
+-- 전 사원의 사원명, 연봉 조회 (연봉별 내림차순)
+SELECT EMP_NAME, SALARY * 12 AS "연봉"
+FROM EMPLOYEE
+-- ORDER BY SALARY * 12 DESC;
+-- ORDER BY 연봉 DESC; -- 별칭 사용 가능
+ORDER BY 2 DESC; -- 컬럼순번 사용가능(컬럼개수보다 큰 숫자는 안됨)
