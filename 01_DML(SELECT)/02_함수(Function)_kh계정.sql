@@ -183,3 +183,55 @@ SELECT 'ABC' || '초콜릿' FROM DUAL; -- 동일
 SELECT CONCAT ('ABC', '초콜릿', '먹고싶다') FROM DUAL; -- invalid number of arguments 오류발생: 문자열 두 개만 전달받을 수 있음
 -- 해결방법: 연결연산자 사용
 SELECT 'ABC' || '초콜릿' || '먹고싶다' FROM DUAL;
+
+--------------------------------------------------------------------------------
+/*
+    * REPLACE
+    
+    [표현법]
+    REPLACE(STRING, STR1, STR2)     => 결과값 CHARACTER 타입
+*/
+
+SELECT EMP_NAME, EMAIL, REPLACE(EMAIL, 'kh.or.kr', 'gmail.com')
+FROM EMPLOYEE;
+
+/*
+SELECT EMP_NAME, EMP_NO, REPLACE(EMP_NO, SUBSTR(EMP_NO, 9, 14), '******')
+FROM EMPLOYEE;
+*/
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+/*
+    <숫자 처리 함수>
+    
+    * ABS: 숫자의 절대값을 구해주는 함수
+    
+    [표현법]
+    ABS(NUMBER)         => 결과값은 NUMBER 타입
+*/    
+
+SELECT ABS(-10) FROM DUAL;
+
+--------------------------------------------------------------------------------
+/*
+    * MOD: 두 수로 나눈 나머지값을 변환해주는 함수
+    
+    [표현법]
+    MOD(NUMBER1, NUMBER2)   => 결과값은 NUMBER 타입
+*/
+
+SELECT MOD(10, 3) FROM DUAL;
+SELECT MOD(10.9, 3) FROM DUAL;
+--------------------------------------------------------------------------------
+/*
+    * ROUND: 반올림한 결과를 반환
+    
+    [표현법]
+    ROUND(NUMBER, [위치])     => 결과값은 NUMBER 타입
+    위치 생략시 0번째 자리에서 반올림
+*/
+
+SELECT ROUND(123.456) FROM DUAL;
+SELECT ROUND(123.456, 1) FROM DUAL;
