@@ -117,3 +117,69 @@ FROM DUAL;
 
 SELECT EMP_NAME, EMP_NO, RPAD(SUBSTR(EMP_NO, 1, 8), 14, '*')
 FROM EMPLOYEE;
+--------------------------------------------------------------------------------
+/*
+    * LTRIM / RTRIM
+    문자열에서 특정 문자를 제거한 나머지를 반환
+    
+    [표현법]
+    LTRIM/RTRIM(STRING, ['제거할 문자들'])        => 생략 시 공백 제거
+    문자열의 왼쪽 혹은 오른쪽에서 제거하고자 하는 문자들을 찾아서 제거 후 문자열 반환
+*/
+
+SELECT LTRIM('   K H ') FROM DUAL; -- 왼쪽에 있는 공백 제거 'K H ' 반환 / 공백 찾아서 제거하고 공백 아닌 문자가 나오면 끝남
+SELECT LTRIM('123123KH123', '123') FROM DUAL; -- 'KH123'출력
+SELECT LTRIM('ACABACCKH', 'ABC') FROM DUAL;
+
+SELECT RTRIM('5782KH123', '0123456789') FROM DUAL; -- 오른쪽에 있는 숫자 제거
+
+/*
+    * TRIM
+    문자열의 앞/뒤/양쪽에 있는 지정한 문자들을 제거한 나머지 문자열 반환
+    
+    [표현법]
+    TRIM([[LEADING|TRAILING|BOTH] 제거하고자 하는 문자들 FROM] STRING )
+*/
+
+SELECT TRIM('   K H   ') FROM DUAL; -- 양쪽에 있는 공백제거 후 'K H'출력
+-- SELECT TRIM('ZZZZKHZZZZ', 'Z') FROM DUAL; -- 오류 발생
+SELECT TRIM('Z' FROM 'ZZZZKHZZZZ') FROM DUAL; -- Z 제거 후 'KH' 출력
+SELECT TRIM(LEADING 'Z' FROM 'ZZZZKHZZZZ') FROM DUAL; -- 왼쪽의 Z 제거 후 'KHZZZZ' 출력
+-- LEADING: 앞 제거 => LTRIM과 유사
+SELECT TRIM(TRAILING 'Z' FROM 'ZZZZKHZZZZ') FROM DUAL; -- 오른쪽의 Z 제거 후 'ZZZZKH' 출력
+-- TRAILING: 뒤 제거 => RTRIM과 유사
+SELECT TRIM(BOTH 'Z' FROM 'ZZZZKHZZZZ') FROM DUAL; -- 양쪽의 Z 제거 후 'KH' 출력
+-- BOTH: 양 쪽 제거 => 생략 시 기본값 
+
+--------------------------------------------------------------------------------
+
+/*
+    * LOWER / UPPER / INITCAP
+    
+    [표현법]
+    LOWER / UPPER / INITCAP(STRING)         => 결과값 CHARACTER 타입
+    
+    LOWER: 다 소문자로 변경한 문자열 반환 (자바의 toLowerCase()와 유사)
+    UPPER: 다 대문자로 변경한 문자열 반환 (자바의 toUpperCase()와 유사)
+    INITCAP: 단어 앞글자마다 대문자로 변경한 문자열 반환
+*/
+
+SELECT LOWER('Welcome To My World!') FROM DUAL;
+SELECT UPPER('Welcome To My World!') FROM DUAL;
+SELECT INITCAP('welcome to my world!') FROM DUAL;
+--------------------------------------------------------------------------------
+
+/*
+    * CONCAT
+    문자열을 두개 전달받아서 하나로 합친 후 결과 반환
+    
+    [표현법]
+    CONCAT(STRING, STRING)      => 결과값 CHARACTER 타입
+*/
+
+SELECT CONCAT('ABC', '초콜릿') FROM DUAL; -- 'ABC초콜릿' 반환
+SELECT 'ABC' || '초콜릿' FROM DUAL; -- 동일
+
+SELECT CONCAT ('ABC', '초콜릿', '먹고싶다') FROM DUAL; -- invalid number of arguments 오류발생: 문자열 두 개만 전달받을 수 있음
+-- 해결방법: 연결연산자 사용
+SELECT 'ABC' || '초콜릿' || '먹고싶다' FROM DUAL;
