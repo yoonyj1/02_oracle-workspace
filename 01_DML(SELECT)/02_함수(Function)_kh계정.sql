@@ -283,3 +283,45 @@ SELECT SYSDATE FROM DUAL; -- 클릭해서 확인 시 시간도 확인 가능
 SELECT EMP_NAME, FLOOR(SYSDATE - HIRE_DATE) || '일' AS "근무일수", 
 CEIL(MONTHS_BETWEEN(SYSDATE, HIRE_DATE)) || '개월' AS "근무개월수"
 FROM EMPLOYEE;
+
+-- * ADD_MONTHS(DATE, NUMBER): 특정날짜에 해당 숫자만큼의 개월수를 더해서 날짜를 반환
+-- => 결과값 DATE 타입
+SELECT ADD_MONTHS(SYSDATE, 6) FROM DUAL;
+-- EMPLOYEE에서 사원명, 입사일, 입사 후 6개월이 된 날짜
+SELECT EMP_NAME, HIRE_DATE, ADD_MONTHS(HIRE_DATE, 6) AS "입사 후 6개월"
+FROM EMPLOYEE;
+
+-- * NEXT_DAY(DATE, 요일(문자|숫자): 특정날짜 이후의 가장 가까운 해당 요일의 날짜를 반환 
+-- => 결과값 DATE 타입
+SELECT SYSDATE, NEXT_DAY(SYSDATE, '금요일') FROM DUAL;
+SELECT SYSDATE, NEXT_DAY(SYSDATE, '금') FROM DUAL;
+SELECT SYSDATE, NEXT_DAY(SYSDATE, 6) FROM DUAL;
+-- 1: 일요일 2: 월요일 .... 7: 토요일
+SELECT SYSDATE, NEXT_DAY(SYSDATE, 'FRIDAY') FROM DUAL; -- 에러: 설정이 한국으로 되있음
+-- 언어변경
+SELECT * FROM NLS_SESSION_PARAMETERS;
+ALTER SESSION SET NLS_LANGUAGE = AMERICAN; -- 영어로 변경
+ALTER SESSION SET NLS_LANGUAGE = KOREAN; -- 한국어로 변경
+
+-- * LAST_DAY(DATE): 해당 월의 마지막 날짜를 구해서 반환
+-- => 결과값 DATE 타입
+SELECT LAST_DAY(SYSDATE) FROM DUAL;
+
+-- EMPLOYEE에서 사원명, 입사일, 입사한 달의 마지막 날짜, 입사한 달의 근무한 일수
+SELECT EMP_NAME, HIRE_DATE, LAST_DAY(HIRE_DATE), LAST_DAY(HIRE_DATE) - HIRE_DATE
+FROM EMPLOYEE;
+
+/*
+    * EXTRACT: 특정 날짜로부터 년도|월|일 값을 추출해서 반환하는 함수
+    
+    [표현법]
+    EXTRACT(YEAR FROM DATE): 년도만 추출
+    EXTRACT(MONTH FROM DATE): 월만 추출
+    EXTRACT(DAY FROM DATE): 일만 추출
+*/
+
+-- 사원명, 입사년도, 입사월, 입사일
+SELECT EMP_NAME, EXTRACT(YEAR FROM HIRE_DATE) AS "입사년도", EXTRACT(MONTH FROM HIRE_DATE) AS "입사월", EXTRACT(DAY FROM HIRE_DATE) AS "입사일"
+FROM EMPLOYEE
+ORDER BY 입사년도, 입사월, 입사일;
+
