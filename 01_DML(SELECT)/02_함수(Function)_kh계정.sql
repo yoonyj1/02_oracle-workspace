@@ -434,3 +434,22 @@ FROM EMPLOYEE; -- BONUS가 NULL인 사원은 NULL로 반환
 
 SELECT EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 || '원' AS "보너스 연봉"
 FROM EMPLOYEE; -- = SALARY * 12
+
+SELECT EMP_NAME, DEPT_CODE, NVL(DEPT_CODE, '부서없음')
+FROM EMPLOYEE;
+
+-- NVL2(컬럼, 반환값1, 반환값2)
+-- 컬럼값이 존재할 경우 반환값1 반환
+-- NULL 일 경우 반환값2 반환
+SELECT EMP_NAME, DEPT_CODE, NVL2(DEPT_CODE, '부서있음', '부서없음')
+FROM EMPLOYEE;
+
+-- 보너스 있는 사람들은 0.7 없는 사람은 0.1
+SELECT EMP_NAME, NVL2(BONUS, 0.7, 0.1) AS "BONUS"
+FROM EMPLOYEE;
+
+-- NULLIF(비교대상1, 비교대상2)
+-- 두 개의 값이 일치하면 NULL 반환, 일치하지 않으면 비교대상1 값을 반환
+
+SELECT NULLIF('123', '123') FROM DUAL;
+SELECT NULLIF('123', '456') FROM DUAL;
