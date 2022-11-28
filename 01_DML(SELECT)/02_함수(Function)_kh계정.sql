@@ -235,3 +235,51 @@ SELECT MOD(10.9, 3) FROM DUAL;
 
 SELECT ROUND(123.456) FROM DUAL;
 SELECT ROUND(123.456, 1) FROM DUAL;
+SELECT ROUND(123.456, 5) FROM DUAL; -- 위치보다 큰 숫자를 넣으면 그대로 출력됨
+SELECT ROUND(123.456, -1) FROM DUAL;
+SELECT ROUND(123.456, -2) FROM DUAL;
+--------------------------------------------------------------------------------
+/*
+    * CEIL
+    올림처리 해주는 함수
+    
+    [표현법]
+    CELI(NUMBER)
+*/
+
+SELECT CEIL(123.152) FROM DUAL; -- 5 이상이 아니어도 무조건 올림 / 위치지정 불가
+--------------------------------------------------------------------------------
+/*
+    * FLOOR
+    소수점 아래 버림처리 하는 함수
+    
+    [표현법]
+    FLOOR(NUMBER)
+*/
+
+SELECT FLOOR(123.152) FROM DUAL;
+SELECT FLOOR(123.952) FROM DUAL; -- 무조건 버림 / 위치지정 불가
+--------------------------------------------------------------------------------
+/*
+    * TRUNC (절삭하다) **
+    위치지정 가능한 버림처리 함수
+    
+    [표현법]
+    TRUNC(NUMBER, [위치])
+*/
+
+SELECT TRUNC(123.456) FROM DUAL; -- 위치지정 안할 경우 FLOOR와 동일함
+SELECT TRUNC(123.456, 1) FROM DUAL; -- 소수점 아래 첫째 자리까지 표현
+SELECT TRUNC(123.456, -1) FROM DUAL;
+--------------------------------------------------------------------------------
+/*
+    <날짜 처리 함수>
+*/
+-- SYSDATE: 시스템에 있는 날짜 및 시간 반환(현재 날짜 및 시간)
+SELECT SYSDATE FROM DUAL; -- 클릭해서 확인 시 시간도 확인 가능
+
+-- * MONTHS_BETWEEN(DATE1, DATE2): 두 날짜 사이의 개월 수 반환 => 내부적으로 DATE1 - DATE2 후 나누기 30, 31
+-- EMPLOYEE에서 사원명, 근무일수, 근무개월수
+SELECT EMP_NAME, FLOOR(SYSDATE - HIRE_DATE) || '일' AS "근무일수", 
+CEIL(MONTHS_BETWEEN(SYSDATE, HIRE_DATE)) || '개월' AS "근무개월수"
+FROM EMPLOYEE;
