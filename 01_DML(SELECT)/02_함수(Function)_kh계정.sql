@@ -352,3 +352,54 @@ SELECT TO_CHAR(SYSDATE, 'HH24:MI:SS') FROM DUAL; -- 24시간형으로 시간반환
 SELECT TO_CHAR(SYSDATE, 'AM HH:MI:SS') FROM DUAL;
 SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD DAY DY') FROM DUAL;
 SELECT TO_CHAR(SYSDATE, 'MON, YYYY') FROM DUAL;
+
+SELECT EMP_NAME, HIRE_DATE, TO_CHAR(HIRE_DATE, 'YYYY-MM-DD')
+FROM EMPLOYEE;
+
+-- EX) 1900년 02월 06일 형식
+SELECT EMP_NAME, HIRE_DATE, TO_CHAR(HIRE_DATE, 'YYYY-MM-DD')
+FROM EMPLOYEE;
+
+SELECT EMP_NAME, HIRE_DATE, TO_CHAR(HIRE_DATE, 'YYYY"년" MM"월" DD"일"') -- 없는 포맷 제시할 때는 ""로 묶기
+FROM EMPLOYEE;
+
+-- 년도와 관련된 포맷
+SELECT TO_CHAR(SYSDATE, 'YYYY'),
+       TO_CHAR(SYSDATE, 'YY'),
+       TO_CHAR(SYSDATE, 'RRRR'),
+       TO_CHAR(SYSDATE, 'RR'),
+       TO_CHAR(SYSDATE, 'YEAR')
+FROM DUAL;
+
+-- 월과 관련된 포맷
+SELECT TO_CHAR(SYSDATE, 'MM'),
+       TO_CHAR(SYSDATE, 'MON'),
+       TO_CHAR(SYSDATE, 'MONTH'),
+       TO_CHAR(SYSDATE, 'RM')
+FROM DUAL;
+
+-- 일과 관련된 포맷
+SELECT TO_CHAR(SYSDATE, 'DDD'), -- 올해 기준으로 오늘이 며칠째인지 반환
+       TO_CHAR(SYSDATE, 'DD'), -- 월 기준으로 오늘이 며칠째인지
+       TO_CHAR(SYSDATE, 'D')   -- 주 기준으로 오늘이 며칠째인지
+FROM DUAL;
+
+-- 요일에 관련된 포맷
+SELECT TO_CHAR(SYSDATE, 'DAY'),
+       TO_CHAR(SYSDATE, 'DY')
+FROM DUAL;
+--------------------------------------------------------------------------------
+/*
+    * TO_DATE: 숫자|문자 타입 데이터를 날짜타입으로 변환
+    
+    [표현법]
+    TO_DATE(숫자|문자, [포맷])        결과값 DATE 타입
+*/
+
+SELECT TO_DATE(20200101) FROM DUAL;
+SELECT TO_DATE(100101) FROM DUAL;
+SELECT TO_DATE('070101') FROM DUAL; -- 0으로 시작하는 경우에는 70101로 인식함 => ''로 묶어서 문자타입으로 변경해서 표현
+SELECT TO_DATE('041030 143000') FROM DUAL; -- 시간까지 같이 적는 경우에는 포맷까지 기록해야함
+SELECT TO_DATE('041030 143000', 'YYMMDD HH24MISS') FROM DUAL;
+SELECT TO_DATE('140630', 'YYMMDD') FROM DUAL; -- 2014년
+SELECT TO_DATE('980630', 'YYMMDD') FROM DUAL; -- 2098년
