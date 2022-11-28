@@ -324,4 +324,30 @@ FROM EMPLOYEE;
 SELECT EMP_NAME, EXTRACT(YEAR FROM HIRE_DATE) AS "입사년도", EXTRACT(MONTH FROM HIRE_DATE) AS "입사월", EXTRACT(DAY FROM HIRE_DATE) AS "입사일"
 FROM EMPLOYEE
 ORDER BY 입사년도, 입사월, 입사일;
+--------------------------------------------------------------------------------
+/*
+    <형 변환 함수> =>> 암기*
+    
+    * TO_CHAR(): 숫자 타입 또는 날짜 타입의 값을 문자타입으로 변환
+    
+    [표현법]
+    TO_CHAR(숫자|날짜, [포맷])    결과값 CHARACTER 타입
+*/
+-- 숫자타입 -> 문자타입
+SELECT TO_CHAR(1324) FROM DUAL;
+SELECT TO_CHAR(1324, '99999') FROM DUAL; -- 5칸짜리 공간확보, 오른쪽 정렬, 빈칸공백
+SELECT TO_CHAR(1324, '00000') FROM DUAL; -- 빈칸을 0으로 채움
+SELECT TO_CHAR(1324, 'L99999') FROM DUAL; -- 현재 설정된 나라(LOCAL)의 화폐단위
+SELECT TO_CHAR(1324, '$99999') FROM DUAL;
+SELECT TO_CHAR(1324, 'L99,999') FROM DUAL;
 
+SELECT EMP_NAME, TO_CHAR(SALARY, 'L999,999,999')
+FROM EMPLOYEE;
+
+-- 날짜타입 -> 문자타입
+SELECT SYSDATE FROM DUAL;
+SELECT TO_CHAR(SYSDATE) FROM DUAL; -- 클릭해서 확인해보면 문자타입으로 반환되어있음(달력표시 안나옴)
+SELECT TO_CHAR(SYSDATE, 'HH:MI:SS') FROM DUAL; -- 12시간형으로 시간반환
+SELECT TO_CHAR(SYSDATE, 'HH24:MI:SS') FROM DUAL; -- 24시간형으로 시간반환
+SELECT TO_CHAR(SYSDATE, 'AM HH:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD DAY DY') FROM DUAL;
