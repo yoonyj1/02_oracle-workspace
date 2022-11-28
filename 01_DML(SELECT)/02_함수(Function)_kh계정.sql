@@ -408,3 +408,29 @@ SELECT TO_DATE('980630', 'YYMMDD') FROM DUAL; -- 2098년 => 무조건 현재 세기로 반
 SELECT TO_DATE('140630', 'RRMMDD') FROM DUAL; -- 2014년
 SELECT TO_DATE('980630', 'RRMMDD') FROM DUAL; -- 1998년
 -- RR: 해당 두자리 년도의 값이 50보다 크면 이전 세기의 년도로 반환, 50보다 작으면 지금 세기의 년도로 반환
+--------------------------------------------------------------------------------
+/*
+    * TO_NUMBER: 문자 타입의 데이터를 숫자타입으로 변환시켜주는 함수
+    
+    [표현법]
+    TO_NUMBER(문자, [포멧])     => 결과값 NUMBER 타입
+*/
+SELECT TO_NUMBER('04270467160') FROM DUAL; -- 맨 앞의 0이 날라감 (숫자 타입으로 저장)
+
+SELECT '10000000' + '500000' FROM DUAL; -- 오라클은 자동형변환이 잘 돼있음
+SELECT '10,000,000' + '500,000' FROM DUAL; -- 오류발생(안에 숫자만 있어야 자동형변환)
+SELECT TO_NUMBER('10,000,000', '99,999,999') + TO_NUMBER('500,000', '999,999') FROM DUAL; -- 강제 형변환
+--------------------------------------------------------------------------------
+/*
+    < NULL 처리 함수 >
+*/
+-- ********NVL(컬럼, 해당 컬럼값이 NULL일 경우 반환할 값)
+SELECT EMP_NAME, BONUS, NVL(BONUS, 0)
+FROM EMPLOYEE;
+
+-- 전 사원의 이름과 보너스 포함 연봉
+SELECT EMP_NAME, (SALARY + SALARY * BONUS) * 12 || '원' AS "보너스 연봉"
+FROM EMPLOYEE; -- BONUS가 NULL인 사원은 NULL로 반환
+
+SELECT EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 || '원' AS "보너스 연봉"
+FROM EMPLOYEE; -- = SALARY * 12
