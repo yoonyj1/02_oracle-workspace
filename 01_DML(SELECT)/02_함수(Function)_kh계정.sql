@@ -453,3 +453,42 @@ FROM EMPLOYEE;
 
 SELECT NULLIF('123', '123') FROM DUAL;
 SELECT NULLIF('123', '456') FROM DUAL;
+--------------------------------------------------------------------------------
+/*
+    < 선택함수 >
+    * DECODE(비교하고자하는 대상(컬럼|산술연산|함수식), 비교값1, 결과값1, 비교값2, 결과값2 ...)
+    ≒ 자바 SWITCH문
+*/
+-- 사번, 사원명, 주민번호
+SELECT
+EMP_ID AS "사번", EMP_NAME AS "이름", EMP_NO AS "주민번호",
+DECODE(SUBSTR(EMP_NO, 8, 1), 1, '남자', 2, '여자', 3, '남자', 4, '여자') AS "성별"
+FROM EMPLOYEE;
+
+-- 직원 급여 조회, 직급별로 인상해서 조회
+-- J7 10%, J6 15%, J5 20%, 나머지는 5% 인상
+SELECT EMP_NAME, JOB_CODE, SALARY,
+       DECODE(JOB_CODE, 'J7', SALARY * 1.1, 
+                        'J6', SALARY * 1.15,
+                        'J5', SALARY * 1.2,
+                        SALARY * 1.05) AS "인상급여"
+FROM EMPLOYEE
+ORDER BY 2;
+
+/*
+    * CASE WHEN THEN
+    
+    [표현법]
+    CASE WHEN 조건식1, THEN 결과값1
+         WHEN 조건식2, THEN 결과값2
+         ...
+         ELSE 결과값
+    END     
+*/
+
+SELECT EMP_NAME, SALARY, 
+       CASE WHEN SALARY >= 5000000 THEN '고급 개발자'
+            WHEN SALARY >= 3500000 THEN '중급 개발자'
+            ELSE '초급 개발자'
+            END AS "레벨"
+FROM EMPLOYEE;

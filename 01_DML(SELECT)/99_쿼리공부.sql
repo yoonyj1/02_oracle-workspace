@@ -54,3 +54,21 @@ AND SUBSTR(EMP_NO, 8, 1) IN ('2', '4');
 SELECT EMP_NAME, EMAIL, SUBSTR(EMAIL, 1, INSTR(EMAIL, '_')-1), LENGTH(SUBSTR(EMAIL, 1, INSTR(EMAIL, '_')-1))
 FROM EMPLOYEE;
 
+-------------------------------- QUIZ 3 ----------------------------------------
+-- [계정생성구문] CREATE USER 계정명, IDENTIFIED 비밀번호;
+
+-- 계정명: SCOTT, 비밀번호: TIGER 계정을 생성하고 싶음
+-- 이때 일반 사용자 계정인 KH계정에 접속해서 CREATE USER SCOTT; 로 실행하니 문제발생
+
+-- 문제점 1. 계정생성은 무조건 관리자계정에서만 가능함
+-- 문제점 2. 비밀번호 입력X, SQL문이 잘못되어있음
+
+-- 조치내용1. 관리자 계정으로 접속해야함.
+-- 조치내용2. CREATE USER SCOTT IDENTIFIED BY TIGER;
+
+-- 위의 SQL문 실행 후 접속을 만들어서 접속을 하려 했으나 실패함
+-- 해당 계정에 테이블 생성 또한 안됨
+
+-- 문제점1. 사용자 계정 생성 후 최소한의 권한 부여가 안됐다
+
+-- 조치내용 GRANT RESOURCE, CONNECT TO SCOTT;
