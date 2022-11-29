@@ -492,3 +492,66 @@ SELECT EMP_NAME, SALARY,
             ELSE '초급 개발자'
             END AS "레벨"
 FROM EMPLOYEE;
+
+-------------------------------- 그룹 함수 --------------------------------------
+-- 1. SUM(숫자타입 컬럼): 해당 컬럼값들의 합계를 구해서 반환해주는 함수
+-- EMPLOYEE 테이블의 전 사원의 총 급여의 합
+SELECT SUM(SALARY)
+FROM EMPLOYEE; -- 전 사원이 한 그룹으로 묶임
+
+/*
+SELECT EMP_NAME, SALARY, SUM(SALARY)
+FROM EMPLOYEE; -- not a single-group group function // SELECT절에서 여러 컬럼 입력하면 오류 발생 -> 하나로 반환되기 때문
+*/
+
+-- 남자사원들의 총 급여의 합
+SELECT SUM(SALARY)
+FROM EMPLOYEE
+WHERE SUBSTR(EMP_NO, 8, 1) IN (1, 3);  -- 남자사원들이 한 그룹으로 묶임
+
+-- 부서코드가 D5인 사원들의 총 연봉합
+SELECT SUM(SALARY * 12)
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5';
+
+-- 2. AVG(숫자타입): 해당 컬럼값의 평균값을 구해서 반환
+-- 전체 사원의 평균 급여 조회
+SELECT ROUND(AVG(SALARY))
+FROM EMPLOYEE;
+
+-- 3. MIN(여러타입): 해당 컬럼값 중 가장 작은 값 구해서 반환
+SELECT MIN(EMP_NAME) AS "문자에서 작은값", MIN(SALARY), MIN(HIRE_DATE) AS "날짜에서 작은 값"
+FROM EMPLOYEE;
+
+-- 4. MAX(여러타입): 해당 컬럼값 중 가장 큰 값 구해서 반환
+SELECT MAX(EMP_NAME) AS "문자에서 큰 값", MAX(SALARY), MAX(HIRE_DATE) AS "날짜에서 큰 값"
+FROM EMPLOYEE;
+
+-- 5. COUNT(*|컬럼|DISTINCT컬럼): 조회된 행 개수를 세서 반환
+--    COUNT(*): 조회된 결과의 모든 행 개수를 세서 반환
+--    COUNT(컬럼): 컬럼에서 NULL이 아닌 행을 세서 반환
+--    COUNT(DISTINCT 컬럼): 중복 제거 후 NULL이 아닌 행 세서 반환 
+
+-- 전체 사원수
+SELECT COUNT(*) -- EMPLOYEE 테이블의 행 개수
+FROM EMPLOYEE;
+
+-- 여자 사원수
+SELECT COUNT(*) -- EMPLOYEE 테이블의 여자인 사원의 수
+FROM EMPLOYEE
+WHERE SUBSTR(EMP_NO, 8, 1) IN ('2', '4');
+
+-- 보너스를 받는 사원 수
+SELECT COUNT(BONUS) -- NULL이 아닌 것만 카운트함
+FROM EMPLOYEE;
+
+SELECT *
+FROM EMPLOYEE
+WHERE BONUS IS NOT NULL;
+
+-- 부서배치를 받은 사원 수
+SELECT COUNT(DEPT_CODE)
+FROM EMPLOYEE;
+
+SELECT COUNT(DISTINCT DEPT_CODE) -- 중복 제거 후 NULL이 아닌 값 세서 반환
+FROM EMPLOYEE;
