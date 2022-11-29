@@ -94,3 +94,13 @@ SELECT DEPT_CODE
 FROM EMPLOYEE
 GROUP BY DEPT_CODE
 HAVING COUNT(BONUS) = 0;
+--------------------------------------------------------------------------------
+/*
+    < SELECT 문 실행순서>
+    SELECT * | 조회하고자하는 컬럼 별칭 | 산술식 "별칭" | 함수식 AS "별칭" -- 5
+    FROM 조회하고자 하는 테이블명 -- 1
+    WHERE 조건식(연산자를 가지고 기술) -- 2
+    GROUP BY 그룹기준으로 삼을 컬럼 | 함수식 -- 3 
+    HAVING 조건식(그룹함수를 가지고 기술) -- 4
+    ORDER BY 컬럼명 | 컬럼순번 | 별칭 [ASC | DESC] [NULLS FIRST / LAST] -- 6
+*/
