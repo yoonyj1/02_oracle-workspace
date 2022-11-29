@@ -104,3 +104,104 @@ HAVING COUNT(BONUS) = 0;
     HAVING 조건식(그룹함수를 가지고 기술) -- 4
     ORDER BY 컬럼명 | 컬럼순번 | 별칭 [ASC | DESC] [NULLS FIRST / LAST] -- 6
 */
+--------------------------------------------------------------------------------
+/*
+    < 집계함수 >
+    그룹별 산출된 결과값에 중간집계를 계산해주는 함수
+    
+    ROLLUP
+    => GROUP BY절에 기술하는 함수
+*/
+
+-- 각 직급별 급여합
+-- 마지막 행으로 전체 총 급여합까지 조회하고 싶을 경우
+SELECT JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY ROLLUP(JOB_CODE)
+ORDER BY 1;
+--ROLLUP: GROUP BY 통해 묶은 그룹의 중간집계를 계산해주는 함수
+--------------------------------------------------------------------------------
+/*
+    < 집합연산자 == SET OPERATION >
+    여러개의 쿼리문을 가지고 하나의 쿼리문으로 만드는 연산자
+    
+    - UNION: OR | 합집합 (두 쿼리문을 수행한 결과값을 더한 후 중복값은 한번만 더해짐)
+    - INTERSECT: AND | 교집합 (두 쿼리문 수행한 결과값에 중복된 결과값)
+    - UNION ALL: 합집합 + 교집합(중복값 두 번 표현됨)
+    - MINUS: 차집합 (선행 결과에서 후행 결과 값을 뺀 나머지)
+*/
+
+-- 1. UNION
+-- 부서코드가 D5인 사원 또는 급여가 300만원 초과인 사원(사번, 이름, 부서코드, 급여)
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' -- 6개 행(박나라,하이유,김해술,심봉선,윤은해,대북혼)
+UNION
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000; -- 8개 행(선동일,송종기,노옹철,유재식,정중하,심봉선,대북혼,전지연)
+
+-- 동일한 쿼리문 => WHERE절에 OR 써도 해결가능
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' OR SALARY > 3000000;
+
+-- 2. INTERSECT
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' -- 6개 행(박나라,하이유,김해술,심봉선,윤은해,대북혼)
+INTERSECT
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000; -- 8개 행(선동일,송종기,노옹철,유재식,정중하,심봉선,대북혼,전지연)
+-- 2개 행(심봉선, 대북혼)
+-- 동일한 쿼리문 => WHERE절에 AND 써도 해결가능
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' AND SALARY > 3000000;
+
+--------------------------------------------------------------------------------
+-- 집합연산자 유의사항
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' -- 6개 행(박나라,하이유,김해술,심봉선,윤은해,대북혼)
+UNION
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY --HIRE_DATE
+FROM EMPLOYEE
+WHERE SALARY > 3000000; -- 8개 행(선동일,송종기,노옹철,유재식,정중하,심봉선,대북혼,전지연)
+ -- 각 쿼리문의 SELECT절에 작성되어있는 컬럼과 컬럼의 개수가 동일해야함 ==> 컬럼 개수뿐 아니라 컬럼자리마다 개수, 타입이 동일해야함.
+ 
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' -- 6개 행(박나라,하이유,김해술,심봉선,윤은해,대북혼)
+-- ORDER BY EMP_NAME
+UNION
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY --HIRE_DATE
+FROM EMPLOYEE
+WHERE SALARY > 3000000
+ORDER BY EMP_NAME; -- 8개 행(선동일,송종기,노옹철,유재식,정중하,심봉선,대북혼,전지연) 
+ -- ORDER BY절은 가장 마지막 쿼리에 작성
+--------------------------------------------------------------------------------
+-- 3. UNION ALL: 여러개의 쿼리결과를 무조건 다 더함 => 중복값 출력가능
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' -- 6개 행(박나라,하이유,김해술,심봉선,윤은해,대북혼)
+UNION ALL
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000; -- 8개 행(선동일,송종기,노옹철,유재식,정중하,심봉선,대북혼,전지연)
+
+--------------------------------------------------------------------------------
+-- 4. MINUS: 선행 SELECT절에서 후행 SELECT의 결과를 뺀 나머지(차집합)
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' -- 6개 행(박나라,하이유,김해술,심봉선,윤은해,대북혼)
+MINUS
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000; -- 8개 행(선동일,송종기,노옹철,유재식,정중하,심봉선,대북혼,전지연)
+-- 'D5'에서 SALARY가 300만원 초과인 사원들 제거
+-- 같은 쿼리문
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' AND SALARY <= 3000000;
