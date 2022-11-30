@@ -169,7 +169,8 @@ WHERE STUDENT_NO = 'A112113'
 GROUP BY ROLLUP(SUBSTR(TERM_NO, 1, 4), SUBSTR(TERM_NO, 5, 2))
 ORDER BY SUBSTR(TERM_NO, 1, 4);
 
--- [Additional SELECT - Option] ----------------------------
+-- [Additional SELECT - Option] ------------------------------------------------
+--------------------------------------------------------------------------------
 -- 1.  학생이름과 주소지를 표시하시오. 단, 출력 헤더는 "학생 이름", "주소지"로 하고,
 --정렬은 이름으로 오름차순 표시하도록 한다.
 SELECT STUDENT_NAME AS "학생 이름" , STUDENT_ADDRESS AS "주소지"
@@ -219,17 +220,25 @@ JOIN TB_DEPARTMENT USING (DEPARTMENT_NO);
 
 -- 8. 과목별 교수 이름을 찾으려고 핚다. 과목 이름과 교수 이름을 출력하는 SQL 문을
 --작성하시오.
-SELECT DISTINCT CLASS_NAME, PROFESSOR_NAME
+/*
+SELECT CLASS_NAME, PROFESSOR_NAME
 FROM TB_CLASS_PROFESSOR
-JOIN TB_CLASS USING(CLASS_NO)
-JOIN TB_PROFESSOR USING(DEPARTMENT_NO);
+INNER JOIN TB_CLASS ON TB_CLASS_PROFESSOR.CLASS_NO = TB_CLASS.CLASS_NO
+INNER JOIN TB_PROFESSOR ON TB_CLASS_PROFESSOR.PROFESSOR_NO = TB_CLASS.PROFESSOR_NO;
+*/
+SELECT CLASS_NAME, PROFESSOR_NAME
+FROM TB_CLASS_PROFESSOR
+JOIN TB_CLASS USING (CLASS_NO)
+JOIN TB_PROFESSOR USING (PROFESSOR_NO);
 
 -- 9. 8 번의 결과 중 ‘인문사회’ 계열에 속핚 과목의 교수 이름을 찾으려고 핚다. 이에
 --해당하는 과목 이름과 교수 이름을 출력하는 SQL 문을 작성하시오.
-SELECT DISTINCT CLASS_NAME, PROFESSOR_NAME
-FROM TB_CLASS
-JOIN TB_PROFESSOR USING(DEPARTMENT_NO)
-WHERE DEPARTMENT_NO BETWEEN '001' AND '021';
+/*
+SELECT CLASS_NAME, PROFESSOR_NAME
+FROM TB_CLASS_PROFESSOR
+INNER JOIN TB_CLASS 
+ON TB_CLASS_PROFESSOR. CLASS_NO = TB_CLASS. CLASS_NO;
+*/
 
 -- 10.  ‘음악학과’ 학생들의 평점을 구하려고 핚다. 음악학과 학생들의 "학번", "학생 이름",
 --"젂체 평점"을 출력하는 SQL 문장을 작성하시오. (단, 평점은 소수점 1 자리까지맊
@@ -246,9 +255,10 @@ ORDER BY 1;
 --위핚 학과 이름, 학생 이름과 지도 교수 이름이 필요하다. 이때 사용핛 SQL 문을
 --작성하시오. 단, 출력헤더는 ?학과이름?, ?학생이름?, ?지도교수이름?으로
 --출력되도록 핚다.
+/*
 SELECT DEPARTMENT_NAME AS "학과이름", STUDENT_NAME AS "학생이름", PROFESSOR_NAME AS "지도교수이름"
 FROM TB_STUDENT
 JOIN TB_DEPARTMENT USING(DEPARTMENT_NO)
 WHERE STUDENT_NO = 'A313047';
-
+*/
 
