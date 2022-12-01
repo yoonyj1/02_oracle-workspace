@@ -6,7 +6,7 @@ WHERE COMM IS NOT NULL;
 --2. EMP테이블에서 커미션을 받지 못하는 직원 조회
 SELECT *
 FROM EMP
-WHERE COMM IS NULL;
+WHERE COMM IS NULL OR COMM = 0;
 
 --3. EMP테이블에서 관리자가 없는 직원 정보 조회
 SELECT *
