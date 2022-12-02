@@ -185,6 +185,113 @@ WHERE JOB_NAME = '대리'
 AND SALARY > ANY (SELECT SALARY
                   FROM EMPLOYEE E, JOB J
                   WHERE E.JOB_CODE = J.JOB_CODE
-                  AND JOB_NAME = '과장' );
+                  AND JOB_NAME = '과장');
+                  
+-- 단일 행 서브쿼리로도 가능함
+SELECT EMP_NAME, SALARY
+FROM EMPLOYEE E
+JOIN JOB J USING(JOB_CODE)
+WHERE JOB_NAME = '대리'
+AND SALARY > (SELECT MIN(SALARY)
+              FROM EMPLOYEE E, JOB J
+              WHERE E.JOB_CODE = J.JOB_CODE
+              AND JOB_NAME = '과장'); 
               
+-- 3) 과장 직급에도 불구하고 차장 직급인 사원들의 모든 급여보다도 더 많이 받는 사원들의 사번, 사원명, 직급명, 급여
+SELECT EMP_ID, EMP_NAME, JOB_NAME, SALARY
+FROM EMPLOYEE
+JOIN JOB USING (JOB_CODE)
+WHERE JOB_NAME = '과장'
+AND SALARY > ALL (SELECT SALARY
+              FROM EMPLOYEE
+              WHERE JOB_NAME = '차장');
               
+--------------------------------------------------------------------------------
+/*
+    3. 다중 열 서브쿼리
+    결과값은 한 행이지만, 나열된 컬럼수가 여러개일 경우
+*/
+
+-- 1. 하이유 사원과 같은 부서코드, 같은 직급코드에 해당하는 사원들 조회(사원명, 부서코드, 직급코드, 입사일)
+--> 단일 행 서브쿼리로도 가능함
+SELECT EMP_NAME, DEPT_CODE, JOB_CODE, HIRE_DATE
+FROM EMPLOYEE
+WHERE DEPT_CODE = (SELECT DEPT_CODE
+                   FROM EMPLOYEE
+                   WHERE EMP_NAME = '하이유')
+AND JOB_CODE = (SELECT JOB_CODE
+                FROM EMPLOYEE
+                WHERE EMP_NAME = '하이유');
+                
+-- > 다중 열 서브쿼리
+SELECT EMP_NAME, DEPT_CODE, JOB_CODE, HIRE_DATE
+FROM EMPLOYEE
+WHERE (DEPT_CODE, JOB_CODE) = (SELECT DEPT_CODE, JOB_CODE
+                               FROM EMPLOYEE
+                               WHERE EMP_NAME = '하이유'); -- D5	J5, 순서 개수 맞춰줘야함
+                               
+-- 박나라 사원과 같은 직급코드, 같은 사수를 가지고 있는 사원들의 사번, 사원명, 직급코드, 사수사번 조회
+SELECT EMP_ID, EMP_NAME, JOB_CODE, MANAGER_ID
+FROM EMPLOYEE
+WHERE (JOB_CODE, MANAGER_ID) = (SELECT JOB_CODE, MANAGER_ID
+                                FROM EMPLOYEE
+                                WHERE EMP_NAME = '박나라');
+                            
+--------------------------------------------------------------------------------
+/*
+    4. 다중 행 다중 열 서브쿼리
+    서브쿼리 조회 결과값이 여러 행 여러 열일 경우
+*/
+
+-- 1) 각 직급별 최소급여를 받는 사원 조회(사번,사원명, 직급코드, 급여)
+--> 각 직급별 최소급여 조회
+SELECT JOB_CODE, MIN(SALARY)
+FROM EMPLOYEE
+GROUP BY JOB_CODE;
+
+SELECT EMP_ID, EMP_NAME, JOB_CODE, SALARY
+FROM EMPLOYEE
+WHERE JOB_CODE = 'J2' AND SALARY = 3700000
+OR JOB_CODE = 'J7' AND SALARY = 1380000;              
+
+-- 서브쿼리로 적용
+SELECT EMP_ID, EMP_NAME, JOB_CODE, SALARY
+FROM EMPLOYEE
+WHERE (JOB_CODE, SALARY) IN (SELECT JOB_CODE, MIN(SALARY)
+                             FROM EMPLOYEE
+                             GROUP BY JOB_CODE)
+ORDER BY 3;
+
+-- 2) 각 부서별 최고급여를 받는 사원들의 사번, 사원명, 부서코드, 급여
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE (DEPT_CODE, SALARY) IN (SELECT DEPT_CODE, MAX(SALARY)
+                              FROM EMPLOYEE
+                              GROUP BY DEPT_CODE)
+ORDER BY 3;
+
+--------------------------------------------------------------------------------
+/*
+    5. 인라인 뷰(INLINE - VIEW)
+    서브쿼리를 수행한 결과를 마치 테이블처럼 사용
+*/
+
+-- 사원들의 사번, 이름, 보너스 포함 연봉 (별칭: 연봉), 부서코드 조회 (보너스 포함 연봉 3000만원 이상인 사원들만 조회, 보너스 포함 연봉이 NULL이 나오지 않게)
+SELECT EMP_ID, EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 AS "연봉", DEPT_CODE
+FROM EMPLOYEE
+WHERE (SALARY + SALARY * NVL(BONUS, 0)) * 12 >= 30000000;
+
+SELECT EMP_ID, EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 AS "연봉", DEPT_CODE
+FROM EMPLOYEE;
+
+-- 이걸 마치 존재하는 테이블처럼 사용할 수 있음 = 인라인 뷰
+SELECT *
+FROM (SELECT EMP_ID, EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 AS "연봉", DEPT_CODE
+FROM EMPLOYEE)
+WHERE 연봉 >= 30000000;
+
+SELECT EMP_NAME, DEPT_CODE, 연봉 --, MANAGER_ID는 오류 남
+FROM (SELECT EMP_ID, EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 AS "연봉", DEPT_CODE
+FROM EMPLOYEE)
+WHERE 연봉 >= 30000000;
+
