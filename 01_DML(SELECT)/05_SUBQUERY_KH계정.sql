@@ -295,3 +295,74 @@ FROM (SELECT EMP_ID, EMP_NAME, (SALARY + SALARY * NVL(BONUS, 0)) * 12 AS "연봉",
 FROM EMPLOYEE)
 WHERE 연봉 >= 30000000;
 
+--> 인라인 뷰를 주로 사용하는 예 => TOP-N분석(상위 몇개만 보여주고 싶을 때)
+-- 전 직원 중 급여가 가장 높은 상위 5명만 조회
+-- * ROWNUM: 오라클에서 제공해주는 컬럼, 조회된 순서대로 1부터 순번을 부여해주는 컬럼
+SELECT ROWNUM, EMP_NAME, SALARY
+FROM EMPLOYEE
+ORDER BY SALARY DESC;
+-- FROM --> SELECT ROWNUM(이때 순번이 부여됨, 정렬하기전에 이미 순번 부여)
+
+SELECT ROWNUM, EMP_NAME, SALARY
+FROM EMPLOYEE
+WHERE ROWNUM <= 5
+ORDER BY SALARY DESC;
+-- 정상적인 결과가 조회되지 않음(정렬이 되기전에 5명이 추려지고 정렬)
+-- ORDER BY절이 다 수행된 결과를 가지고 ROWNUM 부여 후 5명 추려야함
+SELECT ROWNUM, EMP_NAME, SALARY
+FROM (SELECT EMP_NAME, SALARY
+      FROM EMPLOYEE
+      ORDER BY SALARY DESC)
+WHERE ROWNUM <= 5;
+
+-- ROWNUM과 *을 같이 쓰고 싶을 때
+SELECT ROWNUM, E.*
+FROM (SELECT EMP_NAME, SALARY
+      FROM EMPLOYEE
+      ORDER BY SALARY DESC) E
+WHERE ROWNUM <= 5;
+
+-- 가장 최근에 입사한 사원 5명 조회(사원명, 급여, 입사일)
+SELECT ROWNUM, EMP_NAME, SALARY, HIRE_DATE
+FROM (SELECT EMP_NAME, SALARY, HIRE_DATE
+      FROM EMPLOYEE
+      ORDER BY 3 DESC)
+WHERE ROWNUM <= 5;
+
+-- 부서별 평균급여가 높은 3개의 부서 조회(부서코드, 평균급여 별칭부여)
+SELECT ROWNUM, DEPT_CODE, FLOOR(평균급여)
+FROM (SELECT DEPT_CODE, AVG(SALARY) AS "평균급여"
+      FROM EMPLOYEE
+      GROUP BY DEPT_CODE
+      ORDER BY 2 DESC)
+WHERE ROWNUM <= 3;
+--GROUP BY DEPT_CODE;
+--------------------------------------------------------------------------------
+/*
+    * 순위 매기는 함수 (WINDOW FUNCTION)
+    RANK() OVER(정렬기준)   | DENSE_RANK() OVER(정렬기준)
+    
+    - RANK() OVER(정렬기준): 동일한 순위 이후의 등수를 동일한 인원수만큼 건너뛰고 순위 계산
+                            EX) 공동 1위가 2명 그 다음 순위 3 => 1 1 3
+    - DENSE_RANK() OVER(정렬기준): 동일한 순위가 있다고 해도 그 다음 등수를 무조건 1씩 증가시킴
+                                EX) 공동 1위가 2명이더라도 그 다음 순위를 무조건 2위
+        >> 무조건 SELECT절에서만 사용가능
+*/
+-- 급여가 높은 순대로 순위를 매겨서 조회
+SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) AS "순위"
+FROM EMPLOYEE;
+-- 공동 19위 후 그 다음 순위 21위 => 마지막 순위와 조회된 행 수가 같음
+
+SELECT EMP_NAME, SALARY, DENSE_RANK() OVER(ORDER BY SALARY DESC) AS "순위"
+FROM EMPLOYEE;
+-- 공동 19위 그 뒤의 순위 20 => 마지막 순위와 조회된 행 수가 다를 수 있음
+
+-- 상위 5명만 조회
+SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) AS "순위"
+FROM EMPLOYEE;
+
+-- 인라인 뷰를 사용해야함
+SELECT *
+FROM (SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) AS "순위"
+        FROM EMPLOYEE)
+WHERE 순위 <= 5;
