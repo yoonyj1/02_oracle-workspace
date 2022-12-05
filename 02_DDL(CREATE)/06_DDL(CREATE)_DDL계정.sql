@@ -144,3 +144,121 @@ INSERT INTO MEM_NOTNULL VALUES (1, 'user01', 'pass01', '손흥민', '남', NULL, NUL
 INSERT INTO MEM_NOTNULL VALUES (2, 'user02', null, '황희찬', '여', null, 'wqe@naver.com');
 -- ORA-01400: cannot insert NULL into ("DDL"."MEM_NOTNULL"."MEM_PWD")
 -- 의도한대로 오류 남 (NOT NULL 제약조건에 위배)
+INSERT INTO MEM_NOTNULL VALUES (2, 'user01', 'pass01', '황희찬', null, null, null);
+-- 아이디가 중복되어있음에도 불구하고 추가가 됨
+
+--------------------------------------------------------------------------------
+/*
+    * UNIQUE 제약조건
+    해당 컬럼에 중복된 제약조건이 들어가서는 안 될 경우
+    컬럼값에 중복값을 제한하는 제약조건
+    삽입 / 수정 시 기존에 있는 데이터 값 중 중복값이 있을 경우 오류 발생
+*/
+
+CREATE TABLE MEM_UNIQUE (
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE, --> 컬럼레벨 방식
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50)
+);
+
+SELECT * FROM MEM_UNIQUE;
+DROP TABLE MEM_UNIQUE;
+
+-- 테이블 레벨 방식: 모든 컬럼 나열 후 마지막에 기술
+--                제약조건 (컬럼명)
+CREATE TABLE MEM_UNIQUE (
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    UNIQUE(MEM_ID) -- 테이블 레벨 방식
+);
+
+SELECT * FROM MEM_UNIQUE;
+
+INSERT INTO MEM_UNIQUE VALUES(1, 'user01', 'pass01', '손흥민', null, null, null);
+INSERT INTO MEM_UNIQUE VALUES(2, 'user01', 'pass02', '황희찬', null, null, null);
+-- ORA-00001: unique constraint (DDL.SYS_C007063) violated
+-- UNIQUE 제약조건에 위배되었음 -> INSERT 실패
+--> 오류구문을 제약조건명으로 알려줌(특정 컬럼에 어떤 문제가 있는 지 상세히 알려주지는 않음)
+--> 쉽게 파악하기 어려움
+--> 제약조건 부여 시 제약조건명 지정해주지 않으면 시스템에서 임의의 제약조건명을 부여해버린다
+
+/*
+    * 제약조건 부여 시 제약조건명까지 지어주는 방법
+    
+    > 컬럼 레벨 방식
+    CREATE TABLE 테이블명(
+        컬럼명 자료형 [CONSTRAINT 제약조건명] 제약조건,
+        컬럼명 자료형
+    );
+    
+    > 테이블 레벨 방식
+    CREATE TABLE 테이블명(
+        컬럼명 자료형,
+        컬럼명 자료형,
+        [CONSTRAINT 제약조건명] 제약조건(컬럼명)
+    );
+*/
+
+DROP TABLE MEM_UNIQUE;
+
+CREATE TABLE MEM_UNIQUE (
+    MEM_NO NUMBER CONSTRAINT MEMNO_NN NOT NULL,
+    MEM_ID VARCHAR2(20) CONSTRAINT MEMID_NN NOT NULL,
+    MEM_PWD VARCHAR2(20) CONSTRAINT MEMPWD_NN NOT NULL,
+    MEM_NAME VARCHAR2(20) CONSTRAINT MEMNAME_NN NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    CONSTRAINT MEMID_UQ UNIQUE(MEM_ID) -- 테이블 레벨 방식
+);
+
+SELECT * FROM MEM_UNIQUE;
+
+INSERT INTO MEM_UNIQUE VALUES(1, 'user01', 'pass01', '손흥민', null, null, null);
+INSERT INTO MEM_UNIQUE VALUES(2, 'user01', 'pass02', '황희찬', null, null, null);
+-- ORA-00001: unique constraint (DDL.MEMID_UQ) violated
+--                                        -> 정한 오류 이름으로 출력
+
+INSERT INTO MEM_UNIQUE VALUES(2, 'user02', 'pass02', '황희찬', null, null, null);
+INSERT INTO MEM_UNIQUE VALUES(3, 'user03', 'pass03', '이강인', 'ㄴ', null, null); -- 정상적으로 삽입 됨
+--> 성별에 유효한 값이 아닌게 들어와도 잘 INSERT 됨
+
+--------------------------------------------------------------------------------
+/*
+    * CHECK(조건식) 제약조건
+    해당 컬럼에 들어올 수 있는 값에 대한 조건을 제시해둘 수 있음
+    해당 조건에 만족하는 데이터 값만 담길 수 있음
+*/
+
+CREATE TABLE MEM_CHECK(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')), -- 컬럼레벨 방식
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50)
+    -- CHECK(GENDER IN ('남', '여')) -- 테이블레벨 방식
+);
+
+SELECT * FROM MEM_CHECK;
+
+INSERT INTO MEM_CHECK
+VALUES(1, 'user01', 'pass01', '손흥민', '남', null, null);
+
+INSERT INTO MEM_CHECK
+VALUES(2, 'user02', 'pass02', '황희찬', 'ㅋ', null, null);
+-- ORA-02290: check constraint (DDL.SYS_C007073) violated
+-- CHECK 제약조건에 위배되었기 때문에 오류발생 (GENDER에는 '남', '여'만 들어가야함)
+-- 만일 GENDER 컬럼에 데이터 값을 넣고자 한다면, CHECK 제약조건에 만족하는 값을 넣어야함
+INSERT INTO MEM_CHECK
+VALUES(2, 'user02', 'pass02', '황희찬', NULL, null, null); -- CHECK 조건이 있는 컬럼에 NOT NULL 제약조건이 없으면 NULL도 가능함
