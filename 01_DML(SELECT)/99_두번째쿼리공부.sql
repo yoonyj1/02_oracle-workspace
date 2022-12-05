@@ -36,3 +36,22 @@ FROM EMPLOYEE
 GROUP BY DEPT_CODE
 HAVING AVG(SALARY) > 2700000
 ORDER BY 1;
+--------------------------------------------------------------------------------
+-- 서술형 대비
+-- 1. JOIN 종류별 특징, 역할
+-- 2. 함수 종류별 역할
+-- 직원 급여 조회, 직급별로 인상해서 조회
+-- J7 10%, J6 15%, J5 20%, 나머지는 5% 인상
+SELECT EMP_NAME, JOB_CODE, SALARY,
+       DECODE(JOB_CODE, 'J7', SALARY * 1.1, 
+                        'J6', SALARY * 1.15,
+                        'J5', SALARY * 1.2,
+                        SALARY * 1.05) AS "인상급여"
+FROM EMPLOYEE
+ORDER BY 2;
+
+-- '21/9/28'와 같은 문자열을 가지고 '2021-09-28'로 표현해보기
+SELECT TO_CHAR(TO_DATE('21/9/28'), 'YYYY-MM-DD') FROM DUAL;
+
+-- '210908'와 같은 문자열을 가지고 '2021년 9월 8일' 표현
+SELECT SUBSTR(TO_CHAR(TO_DATE('210908'), 'DL'), 1, 11) FROM DUAL;
