@@ -548,3 +548,29 @@ INSERT INTO MEMBER VALUES(3, '이강인', NULL, DEFAULT, DEFAULT); -- 내가 설정한 D
 
 INSERT INTO MEMBER(MEM_NO, MEM_NAME) VALUES(4, '이승우');
 -- 선택되지 않은 컬럼에는 기본적으로 NULL이 들어감 / 단, 해당 컬럼에 DEFAULT 값이 있을 경우 DEFAULT값이 들어감
+
+--==============================================================================
+
+/*
+    !!! !!!!! !!!!!!!!! KH계정 !!! !!!!! !!!!!!!!!
+    < SUBQUERY를 이용한 테이블 생성 >
+    테이블 복사 뜨는 개념
+    [ 표현식 ]
+    CREATE TABLE 테이블명
+    AS 서브쿼리;
+*/
+
+-- EMPLOYEE 테이블을 복제한 새로운 테이블 생성
+CREATE TABLE EMPLOYEE_COPY
+AS SELECT *
+   FROM EMPLOYEE;
+   
+SELECT * FROM EMPLOYEE_COPY;
+-- 컬럼이랑 데이터값, 제약조건 같은 경우 NOT NULL만 복사됨
+
+CREATE TABLE EMPLOYEE_COPY2
+AS SELECT EMP_ID, EMP_NAME, SALARY, BONUS
+    FROM EMPLOYEE -- 테이블 구조만 가져오고 싶은 경우
+    WHERE 1 = 0; -- FALSE인 조건을 WHERE절에 넣음 -> 구조만 복사 가능(데이터 값은 필요가 없을 때)
+    
+SELECT * FROM EMPLOYEE_COPY2;
