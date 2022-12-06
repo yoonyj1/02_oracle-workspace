@@ -574,3 +574,41 @@ AS SELECT EMP_ID, EMP_NAME, SALARY, BONUS
     WHERE 1 = 0; -- FALSE인 조건을 WHERE절에 넣음 -> 구조만 복사 가능(데이터 값은 필요가 없을 때)
     
 SELECT * FROM EMPLOYEE_COPY2;
+
+CREATE TABLE EMPLOYEE_COPY3
+AS SELECT EMP_ID, EMP_NAME, SALARY, SALARY * 12 AS "연봉"
+    FROM EMPLOYEE;
+-- ORA-00998: must name this expression with a column alias
+-- alias: 별칭
+--> 서브쿼리 SELECT 절에 계산식이나 함수식을 가져오는 경우에는 별칭을 정해줘야함
+
+SELECT EMP_NAME, 연봉 FROM EMPLOYEE_COPY3;
+
+--------------------------------------------------------------------------------
+/*
+    * 테이블 생성 후 뒤늦게 제약조건 추가
+    
+    ALTER TABLE 테이블명 변경할 내용;
+    
+    - PRIMARY KEY: ALTER TABLE 테이블명 ADD PRIMARY KEY(컬럼명);
+    - FOREIGN KEY: ALTER TABLE 테이블명 ADD FOREIGN KEY(컬럼명) REFERENCES 참조할 테이블명[(참조할컬럼명)];
+    - UNIQUE     : ALTER TABLE 테이블명 ADD UNIQUE(컬럼명);
+    - CHECK      : ALTER TABLE 테이블명 ADD CHECK(컬럼에 대한 조건식);
+    - NOT NULL   : ALTER TABLE 테이블명 MODIFY 컬럼명 NOT NULL;
+*/
+
+-- 서브쿼리를 이용해서 복제한 테이블은 NN제약조건 빼고 복제 안됨
+-- EMPLOYEE_COPY 테이블에 PRIMARY KEY 제약조건 추가(EMP_ID)
+ALTER TABLE EMPLOYEE_COPY ADD PRIMARY KEY(EMP_ID);
+
+-- EMPLOYEE 테이블에 DEPT_CODE에 외래키 제약조건 추가(DEPARTMENT 테이블 -> DEPT_ID)
+ALTER TABLE EMPLOYEE ADD FOREIGN KEY(DEPT_CODE) REFERENCES DEPARTMENT;--(DEPT_ID) 생략하면 부모테이블의 PK로 감
+
+-- EMPLOYEE테이블에 JOB_CODE에 외래키 제약조건 추가 (JOB)
+ALTER TABLE EMPLOYEE ADD FOREIGN KEY(JOB_CODE) REFERENCES JOB;
+
+-- EMPLOYEE테이블에 SAL_LEVEL 외래키 제약조건 추가 (SAL_GRADE)
+ALTER TABLE EMPLOYEE ADD FOREIGN KEY(SAL_LEVEL) REFERENCES SAL_GRADE;
+
+-- DEPARTMENT테이블에 LOCATION_ID 외래키 제약조건 추가(LOCATION)
+ALTER TABLE DEPARTMENT ADD FOREIGN KEY(LOCATION_ID) REFERENCES LOCATION;
