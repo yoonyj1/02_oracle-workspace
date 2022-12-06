@@ -365,3 +365,186 @@ VALUES('user02', '귤', SYSDATE);
 
 INSERT INTO TB_LIKE
 VALUES('user01', '귤', SYSDATE);
+
+--------------------------------------------------------------------------------
+-- 회원등급에 대한 데이터를 따로 보관하는 테이블
+CREATE TABLE MEM_GRADE(
+    GRADE_CODE NUMBER PRIMARY KEY,
+    GRADE_NAME VARCHAR2(30) NOT NULL
+);
+
+SELECT * FROM MEM_GRADE;
+
+INSERT INTO MEM_GRADE VALUES(10, '일반회원');
+INSERT INTO MEM_GRADE VALUES(20, '우수회원');
+INSERT INTO MEM_GRADE VALUES(30, '특별회원');
+
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER -- 회원등급번호 같이 보관할 컬럼
+);
+
+INSERT INTO MEM 
+VALUES(1, 'user01', 'pass01', '손흥민', '남', NULL, NULL, NULL);
+INSERT INTO MEM
+VALUES(2, 'user02', 'pass02', '황희찬', NULL, NULL, NULL, 10);
+INSERT INTO MEM
+VALUES(3, 'user03', 'pass03', '이강인', NULL, NULL, NULL, 40);
+-- 유효한 회원등급번호가 아님에도 불구하고 INSERT가 됨
+--------------------------------------------------------------------------------
+/*
+    * FOREIGN KEY(외래키) 제약조건
+    다른 테이블에 존재하는 값만 들어와야 되는 특정 컬럼에 부여하는 제약조건
+    --> 다른 테이블을 참조한다고 표현
+    --> 주로 FOREIGN KEY 제약조건에 의해 테이블 간의 관계가 형성됨
+    
+    > 컬럼레벨 방식
+        컬럼명 자료형 [CONSTRAINT 제약조건명] REFERENCES 참조할 테이블명[(참조할 컬럼명)] - 생략 시 기본키로 자동으로 잡힘
+    
+    > 테이블레벨 방식
+        [CONSTRAINT 제약조건명] FOREIGN KEY(컬럼명) REFERENCES 참조할 테이블명[(참조할 컬럼명)]
+        
+    --> 참조할 컬럼명 생략 시 참조할 테이블에 PRIMARY KEY로 지정된 컬럼으로 매칭
+*/
+DROP TABLE MEM;
+
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE--(GRADE_CODE)-- 회원등급번호 같이 보관할 컬럼 / 컬럼레벨방식
+    -- FOREIGN KEY(GRADE_ID) REFERENCES MEM_GRADE 
+);
+
+INSERT INTO MEM 
+VALUES(1, 'user01', 'pass01', '손흥민', '남', NULL, NULL, NULL);
+INSERT INTO MEM
+VALUES(2, 'user02', 'pass02', '황희찬', NULL, NULL, NULL, 10);
+INSERT INTO MEM
+VALUES(3, 'user03', 'pass03', '이강인', NULL, NULL, NULL, 40);
+-- ORA-02291: integrity constraint (DDL.SYS_C007160) violated - parent key not found
+-- PARENT KEY를 찾을 수 없다는 오류 발생
+
+INSERT INTO MEM
+VALUES(3, 'user03', 'pass03', '이강인', NULL, NULL, NULL, 20);
+INSERT INTO MEM
+VALUES(4, 'user04', 'pass04', '이승우', NULL, NULL, NULL, 10);
+
+-- MEM_GRADE(부모테이블)-----|---------------------<----- MEM(자식테이블)
+
+--> 이 때 부모테이블(MEM_GRADE)에서 데이터 값을 삭제할 경우 어떤 문제가 있을까
+--> 데이터 삭제구문 : DELETE FROM 테이블명 WHERE 조건;
+--> MEM_GRADE 테이블에서 10번 등급 삭제
+DELETE FROM MEM_GRADE 
+WHERE GRADE_CODE = '10'; --**********
+-- ORA-02292: integrity constraint (DDL.SYS_C007160) violated - child record found
+-- > 자식테이블(MEM)에서 10이라는 값을 사용하고 있기 때문에 삭제가 안됨
+
+DELETE FROM MEM_GRADE 
+WHERE GRADE_CODE = '30';
+--> 자식테이블에서 30이라는 값을 사용하고 있지 않기 때문에 삭제가 됨
+-- 자식테이블에 이미 사용하고 있는 값이 있을 경우
+--> 부모테이블로부터 무조건 삭제가 안되게 하는 "삭제제한" 옵션이 걸려있음
+
+ROLLBACK;
+--------------------------------------------------------------------------------
+/*
+    자식 테이블 생성 시 외래키 제약조건 부여할 때 삭제옵션 지정가능
+    * 삭제옵션: 부모테이블의 데이터 삭제 시 그 데이터를 사용하고 있는 자식테이블의 값을
+               어떻게 처리할건지
+    - ON DELETE RESTRICTED(기본값): 삭제제한옵션으로, 자식데이터로 쓰이는 부모데이터는 삭제가 안되게끔
+    - ON DELETE SET NULL: 부모데이터 삭제 시 해당 데이터를 쓰고 있는 자식데이터의 값을 NULL로 변경
+    - ON DELETE CASCADE: 부모데이터 삭제 시 해당 데이터를 쓰고 있는 자식데이터도 같이 삭제시킴
+*/
+
+DROP TABLE MEM;
+
+-- ON DELETE SET NULL
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE(GRADE_CODE) ON DELETE SET NULL 
+);
+
+INSERT INTO MEM 
+VALUES(1, 'user01', 'pass01', '손흥민', '남', NULL, NULL, NULL);
+INSERT INTO MEM
+VALUES(2, 'user02', 'pass02', '황희찬', NULL, NULL, NULL, 10);
+INSERT INTO MEM
+VALUES(3, 'user03', 'pass03', '이강인', NULL, NULL, NULL, 20);
+INSERT INTO MEM
+VALUES(4, 'user04', 'pass04', '이승우', NULL, NULL, NULL, 10);
+
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 10;
+-- MEM_GRADE의 GRADE_CODE 10 삭제 후 MEM의 황희찬과 이승우의 GRADE_ID의 값 NULL로 변경
+
+ROLLBACK;
+
+DROP TABLE MEM;
+
+-- ON DELETE CASCADE
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE(GRADE_CODE) ON DELETE CASCADE
+);
+
+INSERT INTO MEM 
+VALUES(1, 'user01', 'pass01', '손흥민', '남', NULL, NULL, NULL);
+INSERT INTO MEM
+VALUES(2, 'user02', 'pass02', '황희찬', NULL, NULL, NULL, 10);
+INSERT INTO MEM
+VALUES(3, 'user03', 'pass03', '이강인', NULL, NULL, NULL, 20);
+INSERT INTO MEM
+VALUES(4, 'user04', 'pass04', '이승우', NULL, NULL, NULL, 10);
+
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 10;
+-- MEM_GRADE의 GRADE_CODE 10 삭제 후 MEM의 황희찬과 이승우의 데이터도 삭제됨
+
+--------------------------------------------------------------------------------
+/*
+    < DEFAULT 기본값 >
+    컬럼을 선정하지 않고 INSERT 시 NULL이 아닌 기본값을 세팅해둘 수 있다
+*/
+DROP TABLE MEMBER;
+-- 컬럼명 자료형 DEFAULT 기본값
+
+CREATE TABLE MEMBER(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    MEM_AGE NUMBER,
+    HOBBY VARCHAR2(20) DEFAULT '없음',
+    ENROLL_DATE DATE DEFAULT SYSDATE
+);
+
+INSERT INTO MEMBER VALUES(1, '손흥민', 20, '축구', '19/12/13');
+INSERT INTO MEMBER VALUES(2, '황희찬', NULL, NULL, NULL);
+INSERT INTO MEMBER VALUES(3, '이강인', NULL, DEFAULT, DEFAULT); -- 내가 설정한 DEFAULT 값으로 들어감
+
+-- INSERT INTO 테이블명(컬럼명, 컬럼명) VALUES(값1, 값2);
+-- NOT NULL인건 꼭 써야함
+
+INSERT INTO MEMBER(MEM_NO, MEM_NAME) VALUES(4, '이승우');
+-- 선택되지 않은 컬럼에는 기본적으로 NULL이 들어감 / 단, 해당 컬럼에 DEFAULT 값이 있을 경우 DEFAULT값이 들어감
