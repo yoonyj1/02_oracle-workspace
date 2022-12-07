@@ -1,4 +1,10 @@
 --실습문제--
+-- 처음에 DROP절을 쓸 때는 만든 테이블 역순으로 작성 => 외래키에 엮여있을 수 있기 때문에
+DROP TABLE TB_RENT;
+DROP TABLE TB_MEMBER;
+DROP TABLE TB_BOOK;
+DROP TABLE TB_PUBLISHER;
+
 --도서관리 프로그램을 만들기 위한 테이블을 만들기
 --이때, 제약조건에 이름을 부여할 것
 -- 각 컬럼에 주석달기
@@ -8,10 +14,9 @@
 --컬럼: PUB_NO(출판사번호) --기본키(PUBLISHER_PK)
 -- PUB_NAME(출판사명) --NOT NULL(PUBLICHSER_NN)
 -- PHONE(출판사전화번호) --제약조건 없음
---3개 정도의 샘플 데이터 추가하기
 
 CREATE TABLE TB_PUBLISHER(
-    PUB_NO NUMBER CONSTRAINT PUBLISHER_PK PRIMARY KEY,
+    PUB_NO NUMBER CONSTRAINT PUBLISHER_PK PRIMARY KEY, -- NUMBER로 저장하게 되면 001 입력해도 1만 저장됨 => 001로 저장하고 싶으면 VARCHAR2로 저장해야함
     PUB_NAME VARCHAR2(30) CONSTRAINT PUBLISHER_NN NOT NULL,
     PHONE VARCHAR2(15)
 );
@@ -19,6 +24,7 @@ COMMENT ON COLUMN TB_PUBLISHER.PUB_NO IS '출판사번호';
 COMMENT ON COLUMN TB_PUBLISHER.PUB_NAME IS '출판사명';
 COMMENT ON COLUMN TB_PUBLISHER.PHONE IS '출판사전화번호';
 
+--3개 정도의 샘플 데이터 추가하기
 INSERT INTO TB_PUBLISHER
 VALUES(001, '더퀘스트', '02-456-7890');
 INSERT INTO TB_PUBLISHER
@@ -34,15 +40,14 @@ VALUES(003, '문학동네', '02-789-1475');
 -- BK_STOCK(재고) --기본값 1로 지정
 -- BK_PUB_NO(출판사번호) --외래키(BOOK_FK)(TB_PUBLISHER 테이블을 참조하도록)
 -- 이때 참조하고 있는 부모데이터 삭제 시 자식데이터도 삭제되도록 설정
---5개 정도의 샘플 데이터 추가하기
 
 CREATE TABLE TB_BOOK(
     BK_NO NUMBER CONSTRAINT BOOK_PK PRIMARY KEY,
     BK_TITLE VARCHAR2(60) CONSTRAINT BOOK_NN_TITLE NOT NULL,
     BK_AUTHOR VARCHAR2(30) CONSTRAINT BOOK_NN_AUTHOR NOT NULL,
     BK_PRICE NUMBER,
-    BK_STOCK NUMBER DEFAULT '1',
-    BK_PUB_NO NUMBER REFERENCES TB_PUBLISHER ON DELETE CASCADE
+    BK_STOCK NUMBER DEFAULT '1', -- DEFAULT는 자료형 바로 옆에 나와야하며, DEFAULT값은 자료형과 일치해야함
+    BK_PUB_NO NUMBER CONSTRAINT BOOK_FK REFERENCES TB_PUBLISHER ON DELETE CASCADE -- 외래키를 지정할 때는 참조하게 되는 컬럼과 자료형이 일치해야함.
 );
 
 COMMENT ON COLUMN TB_BOOK.BK_NO IS '도서번호';
@@ -52,8 +57,7 @@ COMMENT ON COLUMN TB_BOOK.BK_PRICE IS '가격';
 COMMENT ON COLUMN TB_BOOK.BK_STOCK IS '재고';
 COMMENT ON COLUMN TB_BOOK.BK_PUB_NO IS '출판사번호';
 
-
-
+--5개 정도의 샘플 데이터 추가하기
 INSERT INTO TB_BOOK
 VALUES(100, '노마드 투자자 서한', '닉 슬립', 31500, 200, 001);
 INSERT INTO TB_BOOK
@@ -64,8 +68,19 @@ INSERT INTO TB_BOOK
 VALUES(103, '디컨슈머', 'J.B.매키넌', 16650, DEFAULT, 003);
 INSERT INTO TB_BOOK
 VALUES(104, '어른의 문장력', '김선영', 14400, 1280, 001);
-INSERT INTO TB_BOOK(BK_NO, BK_TITLE, BK_AUTHOR)
-VALUES(2, '인생의 역사', '신형철');
+INSERT 
+INTO TB_BOOK
+        (
+          BK_NO
+        , BK_TITLE
+        , BK_AUTHOR
+        )
+VALUES
+        (
+            2
+        , '인생의 역사'
+        , '신형철'
+        );
 
 SELECT * FROM TB_BOOK;
 
@@ -188,12 +203,13 @@ INSERT INTO TB_RENT
 VALUES(3, 1522, 100, '22/10/10');
 
 --2번 도서를 대여한 회원의 이름, 아이디, 대여일, 반납예정일(대여일+7)을 조회하시오.
+-- ANSI 구문
 SELECT MEMBER_NAME, MEMBER_ID, RENT_DATE, RENT_DATE + 7 AS "반납예정일"
 FROM TB_MEMBER M
 JOIN TB_RENT R ON(MEMBER_NO = RENT_MEM_NO)
 WHERE RENT_BOOK_NO = '2';
 
-
-
-
-
+-- 오라클 구문
+SELECT MEMBER_NAME, MEMBER_ID, RENT_DATE, RENT_DATE + 7 AS "반납예정일"
+FROM TB_MEMBER, TB_RENT
+WHERE MEMBER_NO = RENT_MEM_NO AND RENT_BOOK_NO = '2';
