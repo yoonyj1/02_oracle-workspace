@@ -338,3 +338,14 @@ DELETE FROM DEPARTMENT
 WHERE DEPT_ID = 'D3';
 
 ROLLBACK;
+
+--------------------------------------------------------------------------------
+-- * TRUNCATE: 테이블의 전체 행을 삭제할 때 사용되는 구문
+--             DELETE보다 수행속도가 빠름
+--             별도의 조건 제시 불가, ROLLBACK 불가
+-- [표현식] TRUNCATE TABLE 테이블명;
+
+SELECT * FROM EMPLOYEE_COPY3;
+
+TRUNCATE TABLE EMPLOYEE_COPY3;
+ROLLBACK; -- ROLLBACK 해도 복구가 안됨
