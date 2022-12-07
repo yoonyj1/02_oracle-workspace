@@ -104,16 +104,59 @@ COMMENT ON COLUMN TB_MEMBER.PHONE IS '연락처';
 COMMENT ON COLUMN TB_MEMBER.STATUS IS '탈퇴여부';
 COMMENT ON COLUMN TB_MEMBER.ENROLL_DATE IS '가입일';
 
-INSERT INTO TB_MEMBER(MEMBER_NO, MEMBER_ID, MEMBER_PWD, MEMBER_NAME)
-VALUES(1520, 'yoonyj1', '1q2w3e4r!', '윤여진');
-INSERT INTO TB_MEMBER(MEMBER_NO, MEMBER_ID, MEMBER_PWD, MEMBER_NAME)
-VALUES(1521, 'yoonyj2', '1q2w3e4r!', '윤여준');
+INSERT 
+INTO TB_MEMBER
+            (
+              MEMBER_NO
+            , MEMBER_ID
+            , MEMBER_PWD
+            , MEMBER_NAME
+            )
+VALUES
+            (
+                1520
+                , 'yoonyj1'
+                , '1q2w3e4r!'
+                , '윤여진'
+            );
+            
+INSERT
+INTO TB_MEMBER
+        (
+          MEMBER_NO
+        , MEMBER_ID
+        , MEMBER_PWD
+        , MEMBER_NAME
+        )
+VALUES
+        (
+          1521
+        , 'yoonyj2'
+        , '1q2w3e4r!'
+        , '윤여준'
+        );
+        
 INSERT INTO TB_MEMBER
 VALUES(1523, 'insert01', 'delete1', '김선영', 'M', '경기도 이천시', '010-4657-8910', 'Y', '22/12/05');
+
 INSERT INTO TB_MEMBER
 VALUES(1522, 'delete02', 'insert01', '임용한', 'F', '서울특별시', '010-7985-1218', DEFAULT, DEFAULT); 
-INSERT INTO TB_MEMBER(MEMBER_NO, MEMBER_ID, MEMBER_PWD, MEMBER_NAME)
-VALUES(1230, 'qwer1234', 'unionall', '신형철');
+
+INSERT 
+INTO TB_MEMBER
+        (
+              MEMBER_NO
+            , MEMBER_ID
+            , MEMBER_PWD
+            , MEMBER_NAME
+       )
+VALUES
+        (
+                1230
+            , 'qwer1234'
+            , 'unionall'
+            , '신형철'
+        );
 
 
 --4. 도서를 대여한 회원에 대한 데이터를 담기 위한 대여목록 테이블(TB_RENT)
