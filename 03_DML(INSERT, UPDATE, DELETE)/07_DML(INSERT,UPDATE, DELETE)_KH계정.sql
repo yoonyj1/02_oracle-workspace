@@ -276,3 +276,65 @@ WHERE EMP_ID IN (SELECT EMP_ID
                     JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE)
                     WHERE LOCAL_NAME LIKE 'ASIA%');
                 
+SELECT * FROM EMP_SALARY;
+
+--------------------------------------------------------------------------------
+-- UPDATE 시에도 해당 컬럼에 대한 제약조건 위배하면 안됨
+-- 사번이 200번인 사원의 이름을 NULL로 변경하겠다.
+
+SELECT * FROM EMPLOYEE;
+
+UPDATE EMPLOYEE
+SET EMP_NAME = NULL -- 선동일
+WHERE EMP_ID = 200;
+-- ORA-01407: cannot update ("KH"."EMPLOYEE"."EMP_NAME") to NULL
+-- NOT NULL 제약조건 위배
+
+-- 노옹철 사원의 직급코드를 J9로 변경
+UPDATE EMPLOYEE 
+SET JOB_CODE = 'J9'
+WHERE EMP_NAME = '노옹철';
+-- ORA-02291: integrity constraint (KH.SYS_C007188) violated - parent key not found
+-- FOREIGN KEY 제약조건 위배
+
+--------------------------------------------------------------------------------
+COMMIT;
+
+/*
+    4. DELETE
+        테이블에 기록된 데이터를 삭제하는 구문(한 행 단위로 삭제됨)
+        
+        [표현식]
+        DELETE FROM 테이블명
+        [WHERE 조건]; --> 조건 제시 안 할 경우 전체 행 삭제됨
+*/
+
+-- 차은우, 주지훈 사원의 데이터 지우기
+SELECT * FROM EMPLOYEE
+WHERE EMP_NAME = '주지훈';
+
+DELETE FROM EMPLOYEE
+WHERE EMP_NAME = '차은우';
+
+DELETE FROM EMPLOYEE
+WHERE EMP_NAME = '주지훈';
+
+COMMIT;
+
+-- DEPT_ID가 'D1'인 부서를 삭제
+SELECT * FROM DEPARTMENT
+WHERE DEPT_ID = 'D1';
+
+DELETE DEPARTMENT
+WHERE DEPT_ID = 'D1';
+-- ORA-02292: integrity constraint (KH.SYS_C007187) violated - child record found
+-- 외래키 제약조건 위반
+-- D1의 값을 가져다 쓰는 자식데이터가 있기 때문에 삭제가 안됨
+
+SELECT * FROM EMPLOYEE
+WHERE DEPT_CODE = 'D3';
+
+DELETE FROM DEPARTMENT
+WHERE DEPT_ID = 'D3';
+
+ROLLBACK;
