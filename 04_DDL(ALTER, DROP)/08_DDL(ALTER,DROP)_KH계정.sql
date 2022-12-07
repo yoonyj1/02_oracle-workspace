@@ -70,3 +70,56 @@ ALTER TABLE DEPT_COPY2 DROP COLUMN CNAME;
 ALTER TABLE DEPT_COPY2 DROP COLUMN LNAME;
 ALTER TABLE DEPT_COPY2 DROP COLUMN LOCATION_ID;
 -- 오류발생: 최소 한개의 테이블은 존재해야함.
+
+--------------------------------------------------------------------------------
+-- 2) 제약조건 추가 / 삭제
+/*
+    2-1) 제약조건 추가
+    PRIMARY KEY: ADD PRIMARY KEY(컬럼명)
+    FOREIGN KEY: ADD FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명[(컬럼명)] 
+    UNIQUE:      ADD UNIQUE(컬럼명)
+    CHECK:       ADD CHECK(컬럼에 대한 조건) 
+    NOT NULL:    MODIFY 컬럼명 NOT NULL | NULL => NULL쓰면 NULL 허용
+    
+    제약조건명을 지정하고자 한다면 [CONSTRAINT 제약조건명] 제약조건
+*/
+
+-- DEPT_ID에 PRIMARY KEY 제약조건 추가 ADD
+-- DEPT_TITLE에 UNIQUE 제약조건 추가 ADD
+-- LNAME에 NOT NULL 제약조건 추가 MODIFY
+ALTER TABLE DEPT_COPY
+    ADD CONSTRAINT DCOPY_PK PRIMARY KEY(DEPT_ID)
+    ADD CONSTRAINT DCOPY_UQ UNIQUE(DEPT_TITLE)
+    MODIFY LNAME CONSTRAINT DCOPY_NN NOT NULL;
+    
+-- 2-2) 제약조건 삭제: DROP CONSTRAINT 제약조건명
+-- NOT NULL은 삭제가 안되고 MODIFY NULL로 수정해야함
+
+ALTER TABLE DEPT_COPY DROP CONSTRAINT DCOPY_PK;
+
+ALTER TABLE DEPT_COPY
+    DROP CONSTRAINT DCOPY_UQ
+    MODIFY LNAME NULL;
+--------------------------------------------------------------------------------
+
+-- 3) 컬럼명 / 제약조건명 / 테이블명 변경 (RENAME)
+-- 3-1) 컬럼명 변경: RENAME COLUMN 기존컬럼명 TO 바꿀컬럼명
+
+-- DEPT_TITLE => DEPT_NAME
+ALTER TABLE DEPT_COPY RENAME COLUMN DEPT_TITLE TO DEPT_NAME;
+
+-- 3-2) 제약조건명 변경: RENAME CONSTRAINT 제약조건명 TO 바꿀제약조건명
+-- SYS_C007254 => DCOPY_DID_NN
+ALTER TABLE DEPT_COPY RENAME CONSTRAINT SYS_C007254 TO DCOPY_DID_NN;
+
+-- 3-3) 테이블명 변경: RENAME [기존테이블명] TO 바꿀테이블명
+-- DEPT_COPY -> DEPT_TEST
+ALTER TABLE DEPT_COPY RENAME TO DEPT_TEST;
+--------------------------------------------------------------------------------
+-- 테이블 삭제
+DROP TABLE DEPT_TEST;
+
+-- 단, 어딘가에서 참조되고 있는 부모테이블은 함부로 삭제하면 안됨
+-- 삭제방법1. 자식테이블 먼저 삭제한 후 부모테이블 삭제
+-- 삭제방법2. 부모테이블만 삭제할 때 제약조건까지 같이 삭제하는 방법
+--          DROP TABLE 테이블명 CASCADE CONSTRAINT;
