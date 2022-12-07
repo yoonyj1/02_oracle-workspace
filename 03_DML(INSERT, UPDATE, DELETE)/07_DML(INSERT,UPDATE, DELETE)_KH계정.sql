@@ -172,3 +172,107 @@ FROM EMPLOYEE;
 
 SELECT * FROM EMP_OLD;
 SELECT * FROM EMP_NEW;
+
+--------------------------------------------------------------------------------
+/*
+    CRUD
+    CREATE 생성 => INSERT
+    READ 조회 => SELECT
+    UPDATE
+    DELETE
+    
+    3. UPDATE
+        테이블에 기록되어있는 기존의 데이터를 수정하는 구문
+        
+        [표현식]
+        UPDATE 테이블명
+        SET 컬럼명 = 바꿀값,
+            컬럼명 = 바꿀값,
+            ...
+                        --> 여러개의 컬럼값 동시 변경 가능(,로 나열해야함 AND가 아님)
+        [WHERE 조건];    --> 생략하게 되면 전체 행의 모든 데이터가 변경된다. => 조건 기술을 해야함
+*/
+
+-- DEPRATMENT 테이블 복사본 만들기
+CREATE TABLE DEPT_COPY
+AS SELECT *
+    FROM DEPARTMENT;
+
+SELECT * FROM DEPT_COPY;
+
+-- 'D9' 총무부를 전략기획팀으로 수정
+UPDATE DEPT_COPY
+SET DEPT_TITLE = '전략기획팀' -- 총무부
+WHERE DEPT_ID = 'D9'; 
+
+SELECT * FROM DEPT_COPY;
+
+-- 복사본 만들기
+CREATE TABLE EMP_SALARY
+AS SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY, BONUS
+    FROM EMPLOYEE;
+    
+SELECT * FROM EMP_SALARY;
+
+-- 1. 노옹철 사원의 급여를 100만원으로 변경
+-- 데이터 주석으로 백업하기
+-- 업데이트 하기 전에 SELECT 돌려서 확인해보기
+SELECT * FROM EMP_SALARY
+WHERE EMP_NAME = '노옹철';
+
+UPDATE EMP_SALARY
+SET SALARY = 1000000 -- 3700000
+WHERE EMP_ID = 202;
+
+-- 2. 선동일 사원의 급여를 700만원으로 변경하고, 보너스도 0.2로 변경
+UPDATE EMP_SALARY
+SET SALARY = 7000000, --8000000
+    BONUS = 0.2 --0.3
+WHERE EMP_ID = 200;
+
+-- 전체 사원의 급여를 기존 급여의 10프로 인상한 금액으로 변경(기존금액 * 1.1)
+SELECT EMP_NAME, SALARY
+FROM EMP_SALARY;
+
+UPDATE EMP_SALARY
+SET SALARY = (SALARY * 1.1);
+
+-- * UPDATE 시 서브쿼리 사용가능
+/*
+    UPDATE 테이블명
+    SET 컬럼명 = (서브쿼리)
+    [WHERE 조건];
+*/
+
+-- 방명수 사원의 급여, 보너스 값을 유재식 사원의 급여와 보너스 값으로 변경
+SELECT *
+FROM EMP_SALARY
+WHERE EMP_NAME = '방명수';
+
+-- 단일 행 서브쿼리
+UPDATE EMP_SALARY
+SET SALARY = (SELECT SALARY FROM EMP_SALARY WHERE EMP_NAME = '유재식'), -- 1518000
+    BONUS = (SELECT BONUS FROM EMP_SALARY WHERE EMP_NAME = '유재식') -- NULL
+WHERE EMP_NAME = '방명수';
+
+-- 다중 열 서브쿼리
+UPDATE EMP_SALARY
+SET (SALARY, BONUS) = (SELECT SALARY, BONUS FROM EMP_SALARY WHERE EMP_NAME = '유재식') -- 1518000, NULL
+WHERE EMP_NAME = '방명수';
+
+-- ASIA 지역에서 근무하는 사원들의 보너스 값을 0.3으로 변경
+-- ASIA 지역에서 근무하는 사원들 조회
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, BONUS, LOCAL_NAME
+FROM EMP_SALARY
+JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE)
+WHERE LOCAL_NAME LIKE 'ASIA%';
+
+UPDATE EMP_SALARY
+SET BONUS = 0.3
+WHERE EMP_ID IN (SELECT EMP_ID
+                    FROM EMP_SALARY
+                    JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+                    JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE)
+                    WHERE LOCAL_NAME LIKE 'ASIA%');
+                
