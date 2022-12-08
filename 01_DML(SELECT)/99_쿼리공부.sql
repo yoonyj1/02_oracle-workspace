@@ -55,7 +55,7 @@ SELECT EMP_NAME, EMAIL, SUBSTR(EMAIL, 1, INSTR(EMAIL, '_')-1), LENGTH(SUBSTR(EMA
 FROM EMPLOYEE;
 
 -------------------------------- QUIZ 3 ----------------------------------------
--- [계정생성구문] CREATE USER 계정명, IDENTIFIED 비밀번호;
+-- [계정생성구문] CREATE USER 계정명, IDENTIFIED BY 비밀번호;
 
 -- 계정명: SCOTT, 비밀번호: TIGER 계정을 생성하고 싶음
 -- 이때 일반 사용자 계정인 KH계정에 접속해서 CREATE USER SCOTT; 로 실행하니 문제발생
