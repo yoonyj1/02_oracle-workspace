@@ -116,7 +116,39 @@ STUDENT_COUNT*/
 C1753800 서어방언학 29
 C1753400 서어문체론 23
 C2454000 원예작물번식학특론 22*/
+/*SELECT 과목이름, 누적수강생수(명)
+FROM (
+        SELECT CLASS_NO AS "과목번호", CLASS_NAME AS "과목이름", COUNT(STUDENT_NO) AS "누적수강생수(명)"
+        FROM TB_CLASS C
+        JOIN TB_GRADE G USING(CLASS_NO)
+        WHERE TERM_NO LIKE '2009%' OR TERM_NO LIKE '2008%' OR TERM_NO LIKE '2007%'
+        GROUP BY CLASS_NO, CLASS_NAME
+        ORDER BY 3 DESC
+        );*/
+        
+/*SELECT V.과목번호
+     , V.과목이름
+     , V."누적수강생수(명)"
+  FROM (SELECT C.CLASS_NO 과목번호
+             , C.CLASS_NAME 과목이름
+             , COUNT(*) "누적수강생수(명)"
+          FROM TB_CLASS C
+          JOIN (SELECT * FROM TB_GRADE
+                WHERE SUBSTR(TERM_NO, 1, 4) IN ('2005', '2006', '2007', '2008', '2009')) G 
+                ON(C.CLASS_NO = G.CLASS_NO)
+         GROUP BY C.CLASS_NO, C.CLASS_NAME
+         ORDER BY 3 DESC) V
+ WHERE ROWNUM < 4;*/         
 
+
+SELECT *
+FROM (SELECT CLASS_NO AS "과목번호", CLASS_NAME AS "과목이름", COUNT(STUDENT_NO) AS "누적수강생수(명)"
+        FROM TB_CLASS 
+        JOIN TB_GRADE USING(CLASS_NO)
+        WHERE TERM_NO LIKE '2009%' OR TERM_NO LIKE '2008%' OR TERM_NO LIKE '2007%' OR TERM_NO LIKE '2006%' OR TERM_NO LIKE '2005%' 
+        GROUP BY CLASS_NO, CLASS_NAME
+        ORDER BY 3 DESC)
+WHERE ROWNUM <= 3;
 
 ----------------------------------DML-------------------------------------------
 /*1. 과목유형 테이블(TB_CLASS_TYPE)에 아래와 같은 데이터를 입력하시오.
@@ -217,5 +249,7 @@ DELETE FROM TB_GRADE
 WHERE STUDENT_NO IN (SELECT STUDENT_NO
                       FROM TB_STUDENT
                       WHERE ABSENCE_YN = 'Y');
+                      
+                      ROLLBACK;
                       
             
