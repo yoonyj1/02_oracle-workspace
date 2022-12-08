@@ -97,9 +97,22 @@ SELECT BOOK_NO, WRITER_NO
 FROM TB_BOOK_AUTHOR
 WHERE COMPOSE_TYPE IN ('옮김', '역주', '편역', '공역');
 
+DELETE FROM TB_BOOK_AUTHOR
+WHERE COMPOSE_TYPE IN ('옮김', '역주', '편역', '공역');
 
 /*12. 2007년도에 출판된 번역서 이름과 번역자(역자)를 표시하는 SQL 구문을 작성하시오.*/
+/*SELECT BOOK_NM, WRITER_NM
+FROM TB_BOOK B
+JOIN TB_BOOK_AUTHOR A USING(BOOK_NO)
+JOIN TB_WRITER W USING(WRITER_NO)
+WHERE COMPOSE_TYPE IN ('옮김', '역주', '편역', '공역');
+잘못품*/
 
+SELECT BOOK_NM, WRITER_NM
+FROM TB_BOOK_AUTHOR A
+JOIN TB_BOOK USING(BOOK_NO)
+JOIN TB_WRITER USING(WRITER_NO)
+WHERE COMPOSE_TYPE IN ('지음', '엮음', '편역', '공역') AND BOOK_NO LIKE '2007%';
 
 /*13. 12번 결과를 활용하여 대상 번역서들의 출판일을 변경할 수 없도록 하는 뷰를 생성하는 SQL
 구문을 작성하시오. (뷰 이름은 “VW_BOOK_TRANSLATOR”로 하고 도서명, 번역자, 출판일이
@@ -107,31 +120,83 @@ WHERE COMPOSE_TYPE IN ('옮김', '역주', '편역', '공역');
 
 /*14. 새로운 출판사(춘 출판사)와 거래 계약을 맺게 되었다. 제시된 다음 정보를 입력하는 SQL
 구문을 작성하시오.(COMMIT 처리할 것)*/
+INSERT INTO TB_PUBLISHER VALUES('춘 출판사', '02-6710-3737', DEFAULT);
+COMMIT;
 
 /*15. 동명이인(同名異人) 작가의 이름을 찾으려고 한다. 이름과 동명이인 숫자를 표시하는 SQL 구문을
 작성하시오.*/
+SELECT W.WRITER_NM, COUNT(*)
+FROM TB_WRITER W
+JOIN TB_WRITER R ON(W.WRITER_NM = R.WRITER_NM)
+WHERE W.WRITER_NM IN SUBSTR(R.WRITER_NM, 1)
+GROUP BY W.WRITER_NM;
+
+SELECT *
+FROM (SELECT WRITER_NM, COUNT(*)
+        FROM TB_WRITER
+        GROUP BY WRITER_NM
+        HAVING WRITER_NM IN(SUBSTR(WRITER_NM, 1)));
+
+
 
 
 /*16. 도서의 저자 정보 중 저작 형태(compose_type)가 누락된 데이터들이 적지 않게 존재한다. 해당 컬럼이
 NULL인 경우 '지음'으로 변경하는 SQL 구문을 작성하시오.(COMMIT 처리할 것)*/
+UPDATE TB_BOOK_AUTHOR
+SET COMPOSE_TYPE = '지음'
+WHERE COMPOSE_TYPE IS NULL;
 
+COMMIT;
 
 /*17. 서울지역 작가 모임을 개최하려고 한다. 사무실이 서울이고, 사무실 전화 번호 국번이 3자리인 작가의
 이름과 사무실 전화 번호를 표시하는 SQL 구문을 작성하시오.*/
-
+SELECT WRITER_NM, OFFICE_TELNO
+FROM TB_WRITER
+WHERE OFFICE_TELNO LIKE '02%' AND OFFICE_TELNO LIKE '02-___-%';
 
 /*18. 2006년 1월 기준으로 등록된 지 31년 이상 된 작가 이름을 이름순으로 표시하는 SQL 구문을 작성하시오.*/
-
+SELECT WRITER_NM, REGIST_DATE
+FROM TB_WRITER
+WHERE ADD_MONTHS(REGIST_DATE, 372) <= '06/01/01';
 
 /*19. 요즘 들어 다시금 인기를 얻고 있는 '황금가지' 출판사를 위한 기획전을 열려고 한다. '황금가지' 
 출판사에서 발행한 도서 중 재고 수량이 10권 미만인 도서명과 가격, 재고상태를 표시하는 SQL 구문을
 작성하시오. 재고 수량이 5권 미만인 도서는 ‘추가주문필요’로, 나머지는 ‘소량보유’로 표시하고, 
 재고수량이 많은 순, 도서명 순으로 표시되도록 한다. */
-
+SELECT BOOK_NM, PRICE, CASE WHEN STOCK_QTY < 5 THEN '추가주문필요'
+                            ELSE '소량보유'
+                            END
+FROM TB_BOOK
+WHERE STOCK_QTY < 10
+ORDER BY STOCK_QTY DESC, 1;
 
 /*20. '아타트롤' 도서 작가와 역자를 표시하는 SQL 구문을 작성하시오. (결과 헤더는
 ‘도서명’,’저자’,’역자’로 표시할 것)*/
+SELECT B.BOOK_NM AS "도서명", W.WRITER_NM AS "저자", W.WRITER_NM AS "역자"
+FROM TB_BOOK B
+JOIN TB_BOOK_AUTHOR A ON(B.BOOK_NO = A.BOOK_NO)
+JOIN TB_WRITER W ON(A.WRITER_NO = W.WRITER_NO)
+WHERE W.WRITER_NM =(SELECT WRITER_NO
+                    FROM TB_BOOK_TRANSLATOR
+                    WHERE BOOK_NO = '1991081002');
+                                
+SELECT *
+FROM (SELECT B.BOOK_NM AS "도서명", W.WRITER_NM AS "저자", W.WRITER_NM AS "역자"
+        FROM TB_BOOK
+        JOIN TB_BOOK_AUTHOR ON(B.BOOK_NO = A.BOOK_NO)
+        JOIN TB_WRITER  ON(A.WRITER_NO = W.WRITER_NO);
 
+SELECT *
+FROM TB_BOOK_TRANSLATOR
+WHERE BOOK_NO = '1991081002';
+
+SELECT *
+FROM TB_WRITER
+WHERE WRITER_NO = '647';
+
+SELECT *
+FROM TB_BOOK_AUTHOR
+WHERE BOOK_NO = '1991081002';
 
 /*21. 현재 기준으로 최초 발행일로부터 만 30년이 경과되고, 재고 수량이 90권 이상인 도서에 대해 도서명, 재고
 수량, 원래 가격, 20% 인하 가격을 표시하는 SQL 구문을 작성하시오. (결과 헤더는 “도서명”, “재고
