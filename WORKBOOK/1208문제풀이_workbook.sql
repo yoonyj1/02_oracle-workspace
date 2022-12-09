@@ -78,7 +78,11 @@ VW_학생일반정보
 학번
 학생이름
 주소*/
-
+CREATE VIEW VW_학생일반정보
+AS (SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS
+    FROM TB_STUDENT);
+    
+GRANT CREATE VIEW TO workbook;
 
 /*11. 춘 기술대학교는 1 년에 두 번씩 학과별로 학생과 지도교수가 지도 면담을 진행한다. 
 이를 위해 사용할 학생이름, 학과이름, 담당교수이름 으로 구성되어 있는 VIEW 를 만드시오.
@@ -90,7 +94,12 @@ VW_지도면담
 학생이름
 학과이름
 지도교수이름*/
-
+CREATE VIEW VW_지도면담
+AS (SELECT STUDENT_NAME, DEPARTMENT_NAME, PROFESSOR_NAME
+    FROM TB_STUDENT
+    JOIN TB_DEPARTMENT USING(DEPARTMENT_NO)
+    JOIN TB_PROFESSOR ON(COACH_PROFESSOR_NO = PROFESSOR_NO)
+    );
 
 /*12. 모든 학과의 학과별 학생 수를 확인할 수 있도록 적절한 VIEW 를 작성해 보자.
 뷰 이름
@@ -98,6 +107,11 @@ VW_학과별학생수
 컬럼
 DEPARTMENT_NAME
 STUDENT_COUNT*/
+CREATE VIEW VW_학과별학생수
+AS (SELECT DEPARTMENT_NAME, COUNT(STUDENT_NO) AS "STUDENT_COUNT"
+    FROM TB_DEPARTMENT
+    JOIN TB_STUDENT USING(DEPARTMENT_NO)
+    GROUP BY DEPARTMENT_NAME);
 
 
 /*13. 위에서 생성한 학생일반정보 View 를 통해서 학번이 A213046 인 학생의 이름을 본인
@@ -139,7 +153,6 @@ FROM (
          GROUP BY C.CLASS_NO, C.CLASS_NAME
          ORDER BY 3 DESC) V
  WHERE ROWNUM < 4;*/         
-
 
 SELECT *
 FROM (SELECT CLASS_NO AS "과목번호", CLASS_NAME AS "과목이름", COUNT(STUDENT_NO) AS "누적수강생수(명)"
