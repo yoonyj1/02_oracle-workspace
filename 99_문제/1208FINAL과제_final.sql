@@ -179,6 +179,9 @@ FROM TB_BOOK
 WHERE STOCK_QTY < 10 AND PUBLISHER_NM = '황금가지'
 ORDER BY STOCK_QTY DESC, 1;
 
+
+
+
 /*20. '아타트롤' 도서 작가와 역자를 표시하는 SQL 구문을 작성하시오. (결과 헤더는
 ‘도서명’,’저자’,’역자’로 표시할 것)*/
 
@@ -220,7 +223,14 @@ WHERE BOOK_NO = '1991081002';*/
 수량, 원래 가격, 20% 인하 가격을 표시하는 SQL 구문을 작성하시오. (결과 헤더는 “도서명”, “재고
 수량”, “가격(Org)”, “가격(New)”로 표시할 것. 재고 수량이 많은 순, 할인 가격이 높은 순, 도서명
 순으로 표시되도록 할 것*/
+-- 51개 출력
 SELECT BOOK_NM AS "도서명", STOCK_QTY AS "재고수량", PRICE AS "가격(Org)", (PRICE - (PRICE * 0.2)) AS "가격(New)"
 FROM TB_BOOK
 WHERE EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM ISSUE_DATE) > 30 AND STOCK_QTY >= 90
+ORDER BY 재고수량 DESC, (PRICE - (PRICE * 0.2)) DESC, 도서명;
+
+-- 56개 출력
+SELECT BOOK_NM AS "도서명", STOCK_QTY AS "재고수량", PRICE AS "가격(Org)", (PRICE - (PRICE * 0.2)) AS "가격(New)"
+FROM TB_BOOK
+WHERE ADD_MONTHS(ISSUE_DATE, 360) < SYSDATE AND STOCK_QTY >= 90
 ORDER BY 재고수량 DESC, (PRICE - (PRICE * 0.2)) DESC, 도서명;
