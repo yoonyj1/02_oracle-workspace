@@ -313,3 +313,83 @@ UPDATE VW_JOINEMP
 SET DEPT_TITLE = '회계부'
 WHERE EMP_ID = 200;
 -- ORA-01779: cannot modify a column which maps to a non key-preserved table
+
+-- DELETE
+DELETE FROM VW_JOINEMP
+WHERE EMP_ID = 200;
+
+ROLLBACK;
+
+--------------------------------------------------------------------------------
+/*
+    * VIEW 옵션
+    
+    [상세표현식]
+    CREATE OR REPLACE [FORCE | NOFORCE -> DEFAULT] VIEW VIEW명
+    AS 서브쿼리
+    [WITH CHECK OPTION]
+    [WITH READ ONLY] => 오로지 조회만 가능
+    
+    1) OR REPLACE: 기존에 동일한 뷰가 있을 경우 갱신시키고, 존재하지 않으면 새로이 생성시킨다.
+    2) FORCE | NOFORCE
+        > FORCE     : 서브쿼리에 기술된 테이블이 존재하지 않아도 뷰가 생성되게 하는
+        > NOFORCE   : 서브쿼리에 기술된 테이블이 존재하는 테이블이어야만 뷰가 생성되게 하는(생략 시 기본값)
+    3) WITH CHECK OPTION: DML 시 서브쿼리에 기술된 조건에 부합한 값으로만 DML 가능하도록
+    4) WITH READ ONLY: 뷰에 대해 조회만 가능(DML 수행 불가)
+*/
+
+-- 2) FORCE | NOFORCE
+-- NOFORCE   : 서브쿼리에 기술된 테이블이 존재하는 테이블이어야만 뷰가 생성되게 하는(생략 시 기본값)
+CREATE OR REPLACE /*NOFORCE*/ VIEW VW_EMP
+AS SELECT TCODE, TNAME, TCONTENT
+    FROM TT;
+-- ORA-00942: table or view does not exist
+-- 존재하지 않는 테이블이기 때문에 오류발생
+
+-- FORCE
+CREATE OR REPLACE FORCE VIEW VW_EMP
+AS SELECT TCODE, TNAME, TCONTENT
+    FROM TT;
+-- 경고: 컴파일 오류와 함께 뷰가 생성되었습니다.
+
+SELECT * FROM VW_EMP; -- 조회는 안됨
+-- TT 테이블 생성해야만 뷰가 활용가능
+
+CREATE TABLE TT(
+    TCODE NUMBER,
+    TNAME VARCHAR2(20),
+    TCONTENT VARCHAR2(30)
+);
+
+-- 3) WITH CHECK OPTION: 서브쿼리에 기술된 조건에 부합하지 않는 값으로 수정시 오류발생
+-- WITH CHECK OPTION 안쓰고
+CREATE OR REPLACE VIEW VW_EMP
+AS SELECT * FROM EMPLOYEE WHERE SALARY >= 3000000;
+
+SELECT * FROM VW_EMP;
+
+-- 200번 사원의 급여를 200만원으로 변경
+UPDATE VW_EMP
+SET SALARY = 2000000
+WHERE EMP_ID = '200'; -- 수정이 되고 뷰에서는 사라짐
+
+ROLLBACK;
+
+-- WITH CHECK OPTION 쓰고
+CREATE OR REPLACE VIEW VW_EMP
+AS SELECT * FROM EMPLOYEE WHERE SALARY >= 3000000
+WITH CHECK OPTION;
+
+SELECT * FROM VW_EMP;
+
+UPDATE VW_EMP
+SET SALARY = 2000000
+WHERE EMP_ID = '200';
+-- ORA-01402: view WITH CHECK OPTION where-clause violation
+-- 서브쿼리에 기술한 조건에 부합되지 않기 때문에 변경 불가
+
+UPDATE VW_EMP
+SET SALARY = 4000000
+WHERE EMP_ID = '200';
+
+ROLLBACK;

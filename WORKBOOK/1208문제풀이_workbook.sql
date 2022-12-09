@@ -94,12 +94,14 @@ VW_지도면담
 학생이름
 학과이름
 지도교수이름*/
-CREATE VIEW VW_지도면담
-AS (SELECT STUDENT_NAME, DEPARTMENT_NAME, PROFESSOR_NAME
+CREATE OR REPLACE VIEW VW_지도면담
+AS SELECT STUDENT_NAME, DEPARTMENT_NAME, NVL(PROFESSOR_NAME, '지도교수미지정') AS "지도교수"
     FROM TB_STUDENT
     JOIN TB_DEPARTMENT USING(DEPARTMENT_NO)
-    JOIN TB_PROFESSOR ON(COACH_PROFESSOR_NO = PROFESSOR_NO)
-    );
+    LEFT JOIN TB_PROFESSOR ON(COACH_PROFESSOR_NO = PROFESSOR_NO)
+    ORDER BY 2;
+    
+SELECT * FROM VW_지도면담;
 
 /*12. 모든 학과의 학과별 학생 수를 확인할 수 있도록 적절한 VIEW 를 작성해 보자.
 뷰 이름
@@ -116,10 +118,25 @@ AS (SELECT DEPARTMENT_NAME, COUNT(STUDENT_NO) AS "STUDENT_COUNT"
 
 /*13. 위에서 생성한 학생일반정보 View 를 통해서 학번이 A213046 인 학생의 이름을 본인
 이름으로 변경하는 SQL 문을 작성하시오.*/
+SELECT * FROM VW_학생일반정보;
 
+UPDATE VW_학생일반정보
+SET STUDENT_NAME = '윤여진'
+WHERE STUDENT_NO = 'A213046';
+
+ROLLBACK;
 
 /*14. 13 번에서와 같이 VIEW 를 통해서 데이터가 변경될 수 있는 상황을 막으려면 VIEW 를
 어떻게 생성해야 하는지 작성하시오.*/
+CREATE OR REPLACE VIEW VW_학생일반정보
+AS SELECT  G.STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS
+    FROM TB_STUDENT S
+    JOIN TB_GRADE G ON(S.STUDENT_NO = G.STUDENT_NO);
+    
+CREATE OR REPLACE VIEW VW_학생일반정보
+AS SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS
+    FROM TB_STUDENT S
+    WITH READ ONLY;
 
 
 /*15. 춘 기술대학교는 매년 수강신청 기간만 되면 특정 인기 과목들에 수강 신청이 몰려
@@ -152,7 +169,8 @@ FROM (
                 ON(C.CLASS_NO = G.CLASS_NO)
          GROUP BY C.CLASS_NO, C.CLASS_NAME
          ORDER BY 3 DESC) V
- WHERE ROWNUM < 4;*/         
+ WHERE ROWNUM < 4;
+ */         
 
 SELECT *
 FROM (SELECT CLASS_NO AS "과목번호", CLASS_NAME AS "과목이름", COUNT(STUDENT_NO) AS "누적수강생수(명)"
