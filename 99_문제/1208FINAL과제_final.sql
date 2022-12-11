@@ -14,9 +14,8 @@ WHERE ROWNUM = 1;
 
 /*5. 저작 형태가 “옮김”에 해당하는 작가들이 총 몇 명인지 계산하는 SQL 구문을 작성하시오. (결과 헤더는
 “작가(명)”으로 표시되도록 할 것)*/
-SELECT COUNT() AS "작가(명)"
+SELECT COUNT(DISTINCT WRITER_NO) AS "작가(명)"
 FROM TB_BOOK_AUTHOR
-JOIN TB_WRITER USING(WRITER_NO)
 WHERE COMPOSE_TYPE = '옮김';
 
 /*6. 300권 이상 등록된 도서의 저작 형태 및 등록된 도서 수량을 표시하는 SQL 구문을 작성하시오.(저작
