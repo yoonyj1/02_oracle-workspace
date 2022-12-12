@@ -59,9 +59,9 @@ SELECT SEQ_EMPNO.CURRVAL FROM DUAL;
 -- *Action:   select NEXTVAL from the sequence before selecting CURRVAL
 
 -- NEXTVAL을 단 한번도 수행하지 않는 이상 CURRVAL 할 수 없음
--- 마지막으로 성공적으로 수행된 NEXTVAL값이기 때문에
+-- 마지막으로 성공적으로 수행된 NEXTVAL값이 없기 때문에
 
--- SELECT를 여러번 치지말기
+-- SELECT를 여러번 치지말기(NEXTVAL에서) ≫ NEXTVAL이 여러번 실행됨
 SELECT SEQ_EMPNO.NEXTVAL FROM DUAL; -- 300
 SELECT SEQ_EMPNO.CURRVAL FROM DUAL; -- 300: 마지막으로 성공한 NEXTVAL의 값
 
