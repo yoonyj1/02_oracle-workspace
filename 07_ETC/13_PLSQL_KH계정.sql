@@ -229,3 +229,65 @@ BEGIN
   
 END;
 /
+
+------------------------------ 실습문제 ------------------------------------------
+-- 1. 사원의 연봉을 구하는 PL/SQL 블럭 작성, 보너스가 있는 사원은 보너스도 포함하여 계산
+--      보너스가 없으면 보너스 미포함 연봉
+--              있으면 보너스포함 연봉
+-- %ROWTYPE
+-- 출력예시
+-- 급여 이름 원달러(\)999,999,999 ()
+DECLARE
+    E EMPLOYEE%ROWTYPE;
+    SAL NUMBER;
+    
+BEGIN
+    SELECT *
+    INTO E
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    IF E.BONUS IS NULL
+        THEN SAL := E.SALARY * 12;
+    ELSE
+        SAL := (E.SALARY + E.SALARY * E.BONUS) * 12;
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE(E.SALARY || ' ' || E.EMP_NAME || ' ' || LTRIM(TO_CHAR(SAL, 'L999,999,999')));
+
+END;
+/
+
+--------------------------------------------------------------------------------
+-- 3) IF 조건식1 THEN 실행내용1 ELSIF 조건식2 THEN 실행내용2 ... ELSE ... END IF;(IF -ELSEIF - ELSE문)
+
+-- 점수를 입력을 받아서 SCORE라는 변수에 저장
+-- 90점 이상은 'A' 80점 이상은 'B' 70점 이상 'C' 60점 이상 'D' 60미만은 'F'
+-- GRADE 변수에 저장
+-- '당신의 점수는 XX점이고, 학점은 X학점입니다.'
+
+DECLARE
+    SCORE NUMBER;
+    GRADE VARCHAR2(1);
+    
+BEGIN
+    SCORE := &점수;
+    
+    IF SCORE >= 90
+        THEN GRADE := 'A';
+    ELSIF SCORE >= 80
+        THEN GRADE := 'B';
+    ELSIF SCORE >= 70
+        THEN GRADE := 'C';
+    ELSIF SCORE >= 60
+        THEN GRADE := 'D';
+    ELSE
+        GRADE := 'F';
+    END IF;
+    
+    -- '당신의 점수는 XX점이고, 학점은 X학점입니다.'
+    DBMS_OUTPUT.PUT_LINE('당신의 점수는 ' || SCORE || '점이고, ' || '학점은 ' || GRADE || '학점입니다.');
+        
+END;
+/
+
