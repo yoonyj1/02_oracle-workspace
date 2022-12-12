@@ -79,3 +79,93 @@ BEGIN
     
 END;
 /
+
+------------------------------ 실습문제 ------------------------------------------
+/*
+    레퍼런스 타입 변수로 EID, ENAME, SAL, DTITLE을 선언하고
+    각 자료형이 EMPLOYEE, DEPARTMENT 테이블들을 참조하도록
+    
+    사용자가 입력한 사번의 사원의 사번, 사원명, 직급코드, 급여, 부서명 조회 한 후 각 변수에 담아 출력
+*/
+
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    JCODE EMPLOYEE.JOB_CODE%TYPE;
+    SAL EMPLOYEE.SALARY%TYPE;
+    DTITLE DEPARTMENT.DEPT_TITLE%TYPE;
+    
+BEGIN
+    SELECT EMP_ID, EMP_NAME, JOB_CODE, SALARY, DEPT_TITLE
+    INTO EID, ENAME, JCODE, SAL, DTITLE
+    FROM EMPLOYEE
+    JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID)
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('EID: ' || EID);
+    DBMS_OUTPUT.PUT_LINE('ENAME: ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('JCODE: ' || JCODE);
+    DBMS_OUTPUT.PUT_LINE('SAL: ' || SAL);
+    DBMS_OUTPUT.PUT_LINE('DTITLE: ' || DTITLE);
+    
+END;
+/
+--------------------------------------------------------------------------------
+-- 1_3) ROW타입 변수 선언
+-- 테이블의 한 행에 대한 모든 컬럼값을 한꺼번에 담을 수 있는 변수
+-- [표현식] 변수명 테이블명%ROWTYPE;
+
+DECLARE
+    E EMPLOYEE%ROWTYPE;
+    
+BEGIN
+    SELECT * -- ROWTYPE일 경우 필수로 모든 컬럼의 값을 담아야함
+    INTO E
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    -- DBMS_OUTPUT.PUT_LINE(E); 
+    DBMS_OUTPUT.PUT_LINE('사원명: ' || E.EMP_NAME);
+    DBMS_OUTPUT.PUT_LINE('급여: ' || E.SALARY);
+    DBMS_OUTPUT.PUT_LINE('보너스: ' || NVL(E.BONUS, 0));
+                                        -- NVL 사용가능
+END;
+/
+--------------------------------------------------------------------------------
+
+/*
+    2. BEGIN 실행부
+*/
+
+-- < 조건문 >
+-- 1) IF 조건식 THEN 실행내용 END IF; (단독 IF문)
+
+-- 사번 입력 받은 후 해당 사원의 사번, 이름, 급여, 보너스율(%) 출력
+-- 단, 보너스를 받지 않는 사원은 보너스율 출력 전 '보너스를 지급받지 않는 사원입니다.' 출력
+
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    SALARY EMPLOYEE.SALARY%TYPE;
+    BONUS EMPLOYEE.BONUS%TYPE;
+    
+BEGIN
+    SELECT EMP_ID, EMP_NAME, SALARY, NVL(BONUS, 0)
+    INTO EID, ENAME, SALARY, BONUS
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사번: ' || EID);
+    DBMS_OUTPUT.PUT_LINE('이름: ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('급여: ' || SALARY);
+    IF BONUS = 0
+        THEN DBMS_OUTPUT.PUT_LINE('보너스를 지급받지 않는 사원입니다.');
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('보너스율: ' || BONUS * 100 || '%'); 
+    
+END;
+/
+
+
+    
