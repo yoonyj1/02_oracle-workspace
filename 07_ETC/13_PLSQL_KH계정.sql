@@ -167,5 +167,65 @@ BEGIN
 END;
 /
 
-
+-- 2. IF 조건식 THEN 실행내용 ELSE 실행내용 END IF; (≒ 자바에서 IF-ELSE 문)
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    SALARY EMPLOYEE.SALARY%TYPE;
+    BONUS EMPLOYEE.BONUS%TYPE;
     
+BEGIN
+    SELECT EMP_ID, EMP_NAME, SALARY, NVL(BONUS, 0)
+    INTO EID, ENAME, SALARY, BONUS
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사번: ' || EID);
+    DBMS_OUTPUT.PUT_LINE('이름: ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('급여: ' || SALARY);
+    
+    IF BONUS = 0
+        THEN DBMS_OUTPUT.PUT_LINE('보너스를 지급받지 않는 사원입니다.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('보너스율: ' || BONUS * 100 || '%');
+    END IF;
+    
+END;
+/
+
+------------------------------ 실습문제 ------------------------------------------
+-- 레퍼런스타입의 변수(EID, ENAME, DTITLE, NCODE)
+-- 참조테이블 EMPLOYEE, DEPARTMENT, LOCATION
+-- 일반타입 변수 TEAM 문자형10바이트 <= '국내팀' OR '해외팀'
+-- 사용자가 입력한 사번의 사원의 사번, 이름, 부서명, 근무국가코드 조회 후 각 변수에 대입
+-- NCODE의 값이 KO일 경우 TEAM 변수에 '국내팀' 아닐 경우 '해외팀'
+-- 사번, 이름, 부서, 소속(국내팀, 해외팀)에 대해 출력
+
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    DTITLE DEPARTMENT.DEPT_TITLE%TYPE;
+    NCODE LOCATION.NATIONAL_CODE%TYPE;
+    TEAM VARCHAR2(10);
+    
+BEGIN
+    SELECT EMP_ID, EMP_NAME, DEPT_TITLE, NATIONAL_CODE
+    INTO EID, ENAME, DTITLE, NCODE
+    FROM EMPLOYEE
+    JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID)
+    JOIN LOCATION ON(LOCATION_ID = LOCAL_CODE)
+    WHERE EMP_ID = &사번;
+    
+    IF NCODE = 'KO' 
+        THEN TEAM := '국내팀';
+    ELSE
+        TEAM := '해외팀';
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('사번: ' || EID);
+    DBMS_OUTPUT.PUT_LINE('이름: ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('부서명: ' || DTITLE);
+    DBMS_OUTPUT.PUT_LINE('소속: ' || TEAM);
+  
+END;
+/
