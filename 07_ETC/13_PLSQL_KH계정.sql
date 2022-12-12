@@ -291,3 +291,55 @@ BEGIN
 END;
 /
 
+-- 급여
+-- 500만원 이상이면 '고급'
+-- 300만원 이상이면 '중급'
+-- 300만원 미만이면 '초급'
+-- 해당 사원의 급여등급은 XX입니다.
+DECLARE
+    SAL EMPLOYEE.SALARY%TYPE;
+    GRADE VARCHAR2(10);
+    
+BEGIN
+    SELECT SALARY
+    INTO SAL
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+
+    IF SAL >= 5000000
+        THEN GRADE := '고급';
+    ELSIF SAL >= 3000000
+        THEN GRADE := '중급';
+    ELSE
+        GRADE := '초급';
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('해당 사원의 급여등급은 ' || GRADE || '입니다.');
+
+END;
+/
+--------------------------------------------------------------------------------
+-- 4) CASE 비교대상자 WHEN 동등비교할값1 THEN 결과값1 WHEN 동등비교할값2 THEN 결과값2... ELSE 결과값 END;
+DECLARE
+    EMP EMPLOYEE%ROWTYPE;
+    DNAME VARCHAR2(30); -- 부서명 보관변수
+    
+BEGIN
+    SELECT *
+    INTO EMP
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DNAME := CASE EMP.DEPT_CODE
+                WHEN 'D1' THEN '인사팀'
+                WHEN 'D2' THEN '회계팀'
+                WHEN 'D3' THEN '마케팅팀'
+                WHEN 'D4' THEN '국내영업팀'
+                WHEN 'D9' THEN '총무팀'
+                ELSE '해외영업팀'
+            END;
+            
+    DBMS_OUTPUT.PUT_LINE(EMP.EMP_NAME || '은(는) ' || DNAME || '입니다.');
+
+END;
+/
