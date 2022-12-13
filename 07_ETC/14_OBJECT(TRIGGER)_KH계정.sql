@@ -130,3 +130,45 @@ WHERE PCODE = 205;
 
 COMMIT;
 
+-- TB_PRODETAIL 테이블에 INSERT 이벤트 발생 시
+-- TB_PRODUCT 테이블에 매번 자동으로 재고수량 UPDATE 되게끔 트리거 정의
+/*
+    - 상품이 입고 된 경우 => 해당 상품을 찾아서 재고수량 증가 UPDATE
+    UPDATE TB_PRODUCT
+    SET STOCK = STOCK + 현재입고된수량(INSERT된 자료의 AMOUNT 값)
+    WHERE PCODE = 현재 입고된 상품번호(INSERT된 자료의 PCODE 값);
+    
+    - 상품이 출고 된 경우 => 해당 상품을 찾아서 재고수량 감소 UPDATE
+    UPDATE TB_PRODUCT
+    SET STOCK = STOCK - 현재출고된수량(INSERT된 자료의 AMOUNT 값)
+    WHERE PCODE = 현재 출고된 상품번호(INSERT된 자료의 PCODE 값);
+*/
+-- :NEW 써야함
+CREATE OR REPLACE TRIGGER TRG_02
+AFTER INSERT ON TB_PRODETAIL
+FOR EACH ROW
+BEGIN
+    -- 상품이 입고된 경우 => 재고수량 증가
+    IF (:NEW.STATUS = '입고')
+        THEN 
+            UPDATE TB_PRODUCT
+            SET STOCK = STOCK + :NEW.AMOUNT
+            WHERE PCODE = :NEW.PCODE;
+    END IF;
+    -- 상품이 출고된 경우 => 재고수량 감소
+    IF (:NEW.STATUS = '출고')
+        THEN
+            UPDATE TB_PRODUCT
+            SET STOCK = STOCK - :NEW.AMOUNT
+            WHERE PCODE = :NEW.PCODE;
+    END IF;
+END;
+/
+
+-- 210번 상품이 오늘 날짜로 7개 출고
+INSERT INTO TB_PRODETAIL
+VALUES(SEQ_DCODE.NEXTVAL, 210, SYSDATE, 7, '출고');
+
+-- 200번 상품이 오늘 날짜로 100개 입고
+INSERT INTO TB_PRODETAIL
+VALUES(SEQ_DCODE.NEXTVAL, 200, SYSDATE, 100, '입고');
