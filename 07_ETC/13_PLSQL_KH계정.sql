@@ -467,9 +467,54 @@ END;
         
         * 예외명에 뭘 써야할것인지
         *  시스템 예외(오라클에서 미리 정의해둔 예외)
-            - NO_DATE_FOUND: SELECT 한 결과가 한 행도 없을 경우
+            - NO_DATA_FOUND: SELECT 한 결과가 한 행도 없을 경우
             - TOO_MANY_ROWS: SELECT 한 결과가 여러 행인 경우
             - ZERO_DIVIDE: 0으로 나눌 때
             - DUP_VAL_ON_INDEX: UNIQUE 제약조건에 위배 됐을 경우
          
 */
+
+-- 사용자가 입력한 수로 나눗셈 연산한 결과 출력
+DECLARE
+    RESULT NUMBER;
+
+BEGIN
+    RESULT := 10 / &숫자;
+    DBMS_OUTPUT.PUT_LINE('결과: ' || RESULT);
+
+EXCEPTION
+    --WHEN ZERO_DIVIDE THEN DBMS_OUTPUT.PUT_LINE('나누기 연산 시 0으로 나눌 수 없습니다.');
+    WHEN OTHERS THEN DBMS_OUTPUT.PUT_LINE('나누기 연산 시 0으로 나눌 수 없습니다.');
+END;
+/
+
+-- UNIQUE 제약조건 위배
+BEGIN
+    UPDATE EMPLOYEE
+    SET EMP_ID = '&변경할사번'
+    WHERE EMP_NAME = '노옹철';
+    
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN DBMS_OUTPUT.PUT_LINE('이미 존재하는 사번입니다.');
+    
+END;
+/
+
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+
+BEGIN
+    SELECT EMP_ID, EMP_NAME
+    INTO EID, ENAME
+    FROM EMPLOYEE
+    WHERE MANAGER_ID = &사수사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사번: ' || EID);
+    DBMS_OUTPUT.PUT_LINE('이름: ' || ENAME);
+    
+EXCEPTION
+    WHEN TOO_MANY_ROWS THEN DBMS_OUTPUT.PUT_LINE('너무 많은 행이 조회됐습니다.');
+    WHEN NO_DATA_FOUND THEN DBMS_OUTPUT.PUT_LINE('사수를 가진 사원이 없습니다.');
+END;
+/
