@@ -343,3 +343,133 @@ BEGIN
 
 END;
 /
+--------------------------------------------------------------------------------
+SET SERVEROUTPUT ON;
+-- < 반복문 >
+/*
+    1) BASIC LOOP문
+    
+    [표현식]
+    LOOP
+        반복적으로 실행할 구문
+        * 반복문을 빠져나갈 수 있는 구문
+    END LOOP;
+    
+    * 반복문을 빠져나갈 수 있는 구문(2가지)
+     1. IF 조건식 THEN EXIT;
+     2. EXIT WHEN 조건식;
+*/
+
+-- 1 ~ 5까지 순차적으로 1씩 증가해서 출력
+DECLARE
+    I NUMBER := 1;
+    
+BEGIN
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(I);
+        I := I + 1;
+       -- IF I = 6 THEN EXIT; END IF;
+       EXIT WHEN I = 6;
+    END LOOP;    
+    
+END;
+/
+--------------------------------------------------------------------------------
+/*
+    2) FOR LOOP문
+    
+    [표현식]
+    FOR 변수 IN [REVERSE] 초기값..최종값
+                 -> 값을 점점 작아지게 하고싶을 경우
+    LOOP
+        반복적으로 실행할 구문;
+    END LOOP;
+*/
+
+-- 1부터 5까지 출력
+BEGIN
+    FOR I IN 1..5
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(I);        
+    END LOOP;
+
+END;
+/
+
+BEGIN
+    FOR I IN REVERSE 1..5
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(I);
+    END LOOP;
+END;
+/
+
+SELECT * FROM TEST;
+
+CREATE TABLE TEST(
+    TNO NUMBER PRIMARY KEY,
+    TDATE DATE
+);
+
+CREATE SEQUENCE SEQ_TNO
+START WITH 1
+INCREMENT BY 2
+MAXVALUE 1000
+NOCYCLE
+NOCACHE;
+
+BEGIN
+    FOR I IN 1..100 -- 기본적으로 1씩 증가
+    LOOP
+        INSERT INTO TEST VALUES(SEQ_TNO.NEXTVAL, SYSDATE);
+    END LOOP;
+END;
+/
+
+SELECT * FROM TEST;
+
+--------------------------------------------------------------------------------
+/*
+    3) WHILE LOOP문
+    
+    [표현식]
+    WHILE 반복문이 실행될 조건
+    LOOP
+        반복적으로 실행할 구문;
+    END LOOP;
+*/
+
+DECLARE
+    I NUMBER := 1;
+    
+BEGIN
+    WHILE I < 6
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(I);
+        I := I + 1;
+    END LOOP;
+    
+END;
+/
+
+--------------------------------------------------------------------------------
+/*
+    3. 예외처리부
+    
+    예외(EXCEPTION): 실행 중 발생하는 오류
+    
+    [표현식]
+    EXCEPTION
+        WHEN 예외명1 THEN 예외처리구문1;
+        WHEN 예외명2 THEN 예외처리구문2;
+        ...
+        WHEN OTHERS THEN 예외처리구문N;
+        
+        * 예외명에 뭘 써야할것인지
+        *  시스템 예외(오라클에서 미리 정의해둔 예외)
+            - NO_DATE_FOUND: SELECT 한 결과가 한 행도 없을 경우
+            - TOO_MANY_ROWS: SELECT 한 결과가 여러 행인 경우
+            - ZERO_DIVIDE: 0으로 나눌 때
+            - DUP_VAL_ON_INDEX: UNIQUE 제약조건에 위배 됐을 경우
+         
+*/
