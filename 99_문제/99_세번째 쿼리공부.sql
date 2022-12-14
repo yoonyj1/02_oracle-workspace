@@ -51,7 +51,7 @@ GROUP BY DEPT_CODE
 HAVING SUM(SALARY) > 15000000;
 
 
-QUIZ 4
+--QUIZ 4
 CREATE TABLE QUIZ4(
     QNO NUMBER PRIMARY KEY,
     QNAME VARCHAR2(10),
@@ -99,40 +99,62 @@ INSERT INTO QUIZ4 VALUES(1, '퀴즈2번', 50);
 
 /*
 1. DBMS가 뭔지
+DataBase Management System, 데이터베이스에서 데이터추출, 조작, 정의, 제어 등을 할 수 있게 해주는 데이터베이스 전용관리 프로그램
 
 2. DDL문 종류
+CREATE, ALTER, DROP
 
 3. NUMBER 자료형에 뭐 올 수 있는지
 정수 실수 등 숫자면 다 가능
 
 4. CHAR(10) 의미
+10바이트인 문자열을 쓸 수 있고, 10바이트보다 작은 문자열을 입력하면 공백으로 채워짐
 
 5. INNER JOIN
+조인 시 연결하는 컬럼값이 일치하는 값만 조회함
 
 6. OUTTER JOIN
+LEFT|RIGHT를 명시해야하며 연결하는 컬럼값이 일치하지 않아도 포함시켜도 조회함
 
 7. SUBSTR()
+자바에서 SUBSTRING과 유사하며 문자열에서 추출하는 역할을 하는 함수임
 
 8. 테이블이 뭔지
 
+
 9. ResultSet
 
+
 10. UPPER()
+문자열을 대문자로 바꾸는 역할을 하는 함수
 
 11. MINUS, INTERSECT 의미
+MINUS: 선행 SELECT절에서 후행 SELECT의 결과를 뺀 나머지(차집합)
+INTERSECT: 두개의 쿼리의 결과값에서 중복값을 출력
 
 12. INITCAP()
  첫 글자만 대문자로 바꿔주는 함수
  
 13. TRIM()
+문자열의 앞/뒤/양쪽에 있는 지정한 문자들을 제거한 나머지 문자열 반환하며 가운데에 있는 공백은 제거하지 않음
+앞은 LEADING, 뒤는 TRAILING, 양쪽을 다 지우려면 BOTH를 사용한다.
+TRIM([LEADING|TRAILING|BOTH 제거하려는 문자 FROM] 문자열)
 
-14. UNION / UNIONALL 차이
+14. UNION / UNION ALL 차이
+UNION: 여러개의 쿼리 결과 중 중복값을 제거한 값 출력 (합집합)
+UNION ALL: 여러개의 쿼리결과를 무조건 다 더함 => 중복값 출력가능
 
 15. DECODE() 역할
 
+
 16. CONCAT() <=> ||
 
+
 17. ROLLUP()
+GROUP BY 통해 묶은 그룹의 중간집계를 계산해주는 함수
 
 18. RANK OVER() DENSE_RANK OVER()
+RANK OVER()는 공동으로 순위가 있으면 같은 순위를 부여하고 다음 순위를 그 인원수만큼 건너뛰어서 부여하며
+DENSE_RANK OVER() 공동여부와 상관없이 무조건 1씩 순위가 늘어남
+
 */
