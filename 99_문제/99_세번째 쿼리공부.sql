@@ -35,6 +35,44 @@ SELECT EMPNO, EMPNAME, JOBNO, JOBNAME
 FROM TB_EMP
 JOIN TB_JOB ON(JOBNO = JOBCODE);
 
+
+-- QUIZ3(JOIN 복슴)
+ 아래의 SQL구문은 부서별 월급합계가 15,000,000을 초과하는 부서를 조회한 것이다.
+ 그 결과가 올바르지 않다고 할 때 그 원인과 조치사항
+SELECT DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+WHERE SALARY > 15000000
+GROUP BY DEPT_CODE;
+
+SELECT DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+--WHERE SALARY > 15000000 -- GROUP BY는 WHERE가 아닌 HAVING 이용
+GROUP BY DEPT_CODE
+HAVING SUM(SALARY) > 15000000;
+
+
+QUIZ 4
+CREATE TABLE QUIZ4(
+    QNO NUMBER PRIMARY KEY,
+    QNAME VARCHAR2(10),
+    SCORE NUMBER
+);
+
+INSERT INTO QUIZ4 VALUES(1, '퀴즈1번', 30);
+INSERT INTO QUIZ4 VALUES(1, '퀴즈2번', 50);
+-- 에러발생 이유
+
+
+-- JOIN => DECODE
+-- J7인 사원은 급여를 10% 인상
+-- J6인 사원은 급여를 15% 인상
+
+-- '21/09/28' 문자열 => '2021-09-28'로 바꾸기
+
+-- '210908' 문자열 -> 2021년 9월 8일 로 바꾸기
+
+-- 초급개발자 중급개발자 고급개발자
+-- CASE WHEN
 --------------------------------------------------------------------------------
 -- 테이블 생성 관련해서 데이터 타입(CHAR와 VARCHAR2의 차이점): KEYWORD - 고정길이, 가변길이
 -- 오라클 객체(SEQUENCE, VIEW) 각각 정의
@@ -56,3 +94,45 @@ JOIN TB_JOB ON(JOBNO = JOBCODE);
 -- COMMIT, ROLLBACK 각각 뭔지
     --1. COMMIT은 DML문 사용 후 생기는 트랜젝션을 확정시키는 역할을 하며, COMMIT을 함으로써 데이터베이스에 저장이 된다.
     -- 2. ROLLBACK은 DML문 사용 후 생기는 트랜젝션에 있는 것을 취소하는 역할을 하며 마지막 COMMIT 이후에 생기는 트랜젝션의 시점으로 돌아간다.
+    
+----------------------------------------------------------------------------------
+
+/*
+1. DBMS가 뭔지
+
+2. DDL문 종류
+
+3. NUMBER 자료형에 뭐 올 수 있는지
+정수 실수 등 숫자면 다 가능
+
+4. CHAR(10) 의미
+
+5. INNER JOIN
+
+6. OUTTER JOIN
+
+7. SUBSTR()
+
+8. 테이블이 뭔지
+
+9. ResultSet
+
+10. UPPER()
+
+11. MINUS, INTERSECT 의미
+
+12. INITCAP()
+ 첫 글자만 대문자로 바꿔주는 함수
+ 
+13. TRIM()
+
+14. UNION / UNIONALL 차이
+
+15. DECODE() 역할
+
+16. CONCAT() <=> ||
+
+17. ROLLUP()
+
+18. RANK OVER() DENSE_RANK OVER()
+*/
