@@ -111,8 +111,8 @@ INSERT INTO QUIZ4 VALUES(1, '퀴즈2번', 50);
 
 /*
 1. DBMS가 뭔지
-DataBase Management System, 데이터베이스에서 데이터추출, 조작, 정의, 제어 등을 할 수 있게 해주는 데이터베이스 전용관리 프로그램
-추출 조회 정의 제어
+DataBase Management System, 데이터베이스에서 데이터 추출, 조작, 정의, 제어 등을 할 수 있게 해주는 데이터베이스 전용관리 프로그램
+추출 조작 정의 제어
 
 2. DDL문 종류
 CREATE, ALTER, DROP
